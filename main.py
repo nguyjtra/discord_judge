@@ -8,11 +8,9 @@ from app.models.ticket import Ticket
 # 1. THÊM DÒNG IMPORT NÀY:
 from app.api.endpoints import problems, submissions
 app = FastAPI()
-
-# 2. THÊM DÒNG INCLUDE_ROUTER NÀY (Để ngay dưới app = FastAPI()):
 app.include_router(problems.router, prefix="/api/problems", tags=["Problems"])
 app.include_router(submissions.router, prefix="/api/submissions", tags=["Submissions"])
-
+app.include_router(tickets.router, prefix="/api/tickets", tags=["Tickets"])
 @app.on_event("startup")
 def startup_db():
     try:
