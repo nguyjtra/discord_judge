@@ -1,21 +1,28 @@
 from fastapi import FastAPI
 from app.db.session import engine
-# Import Base và các bảng để SQLAlchemy "nhận diện" được chúng
 from app.models.base import Base
 from app.models.problem import Problem
 from app.models.submission import Submission
 from app.models.ticket import Ticket
+
+# 1. THÊM DÒNG IMPORT NÀY:
+from app.api.endpoints import problems
+
 app = FastAPI()
+
+# 2. THÊM DÒNG INCLUDE_ROUTER NÀY (Để ngay dưới app = FastAPI()):
+app.include_router(problems.router, prefix="/api/problems", tags=["Problems"])
+
 
 @app.on_event("startup")
 def startup_db():
     try:
         Base.metadata.create_all(bind=engine)
         with engine.connect() as connection:
-            print("🎉  MYSQL success!")
+            print("🎉 MYSQL THÀNH CÔNG!")
     except Exception as e:
-        print("❌ Fail:", e)
+        print("❌ Lỗi rồi:", e)
 
 @app.get("/")
 def hello_world():
-    return {"message": "Xin chao! API và Database đã kết nối!"}
+    return {"message": "Xin chao! Database đã sẵn sàng."}
