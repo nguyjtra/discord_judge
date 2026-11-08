@@ -1,5 +1,10 @@
 from fastapi import FastAPI
 from app.db.session import engine
+# Import Base và các bảng để SQLAlchemy "nhận diện" được chúng
+from app.models.base import Base
+from app.models.problem import Problem
+from app.models.submission import Submission
+from app.models.ticket import Ticket
 app = FastAPI()
 
 @app.on_event("startup")
