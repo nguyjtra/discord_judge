@@ -14,7 +14,7 @@ def explain_code_error(source_code: str) -> str:
     Hàm này nhận đoạn code bị lỗi, tạo Prompt và nhờ AI giải thích.
     """
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-3.5-flash-lite")
         
         # Khung Prompt chuẩn mực (đóng vai chuyên gia)
         prompt = f"""
