@@ -1,0 +1,10 @@
+# Bỏ qua thư mục môi trường ảo
+venv/
+
+# Bỏ qua file chứa mật khẩu, biến môi trường
+.env
+
+# Bỏ qua các file rác của Python và Mac
+__pycache__/
+*.pyc
+.DS_Store
