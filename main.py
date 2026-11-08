@@ -6,7 +6,7 @@ from app.models.submission import Submission
 from app.models.ticket import Ticket
 
 # 1. THÊM DÒNG IMPORT NÀY:
-from app.api.endpoints import problems, submissions
+from app.api.endpoints import problems, submissions, tickets
 app = FastAPI()
 app.include_router(problems.router, prefix="/api/problems", tags=["Problems"])
 app.include_router(submissions.router, prefix="/api/submissions", tags=["Submissions"])
