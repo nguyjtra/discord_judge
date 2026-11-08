@@ -10,6 +10,7 @@ app = FastAPI()
 @app.on_event("startup")
 def startup_db():
     try:
+        Base.metadata.create_all(bind=engine)
         with engine.connect() as connection:
             print("🎉  MYSQL success!")
     except Exception as e:
