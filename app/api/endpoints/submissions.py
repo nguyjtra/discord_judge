@@ -33,7 +33,7 @@ def submit_code(
     background_tasks.add_task(process_submission, new_submission.id)
     
     return new_submission
-    
+
 # API MỚI: Yêu cầu AI giải thích lỗi của một bài nộp cụ thể
 @router.get("/{submission_id}/explain")
 def explain_submission_error(submission_id: int, db: Session = Depends(get_db)):
@@ -54,3 +54,4 @@ def explain_submission_error(submission_id: int, db: Session = Depends(get_db)):
         "submission_id": submission.id,
         "ai_explanation": explanation
     }
+    
