@@ -29,6 +29,6 @@ def submit_code(
     
     # 2. Bắn tín hiệu cho hàm chấm bài chạy ngầm ở chế độ nền
     # User sẽ nhận được phản hồi ngay lập tức mà không phải chờ Docker chạy xong
-    background_tasks.add_task(process_submission, db, new_submission.id)
+    background_tasks.add_task(process_submission, new_submission.id)
     
     return new_submission
