@@ -5,7 +5,8 @@ from app.db.session import SessionLocal
 from app.models.submission import Submission
 from app.schemas.submission import SubmissionCreate, SubmissionResponse
 from app.services.judge_service import process_submission
-
+from app.models.submission import SubmissionStatus
+from app.services.ai_service import explain_code_error
 router = APIRouter()
 
 def get_db():
@@ -32,3 +33,24 @@ def submit_code(
     background_tasks.add_task(process_submission, new_submission.id)
     
     return new_submission
+    
+# API MỚI: Yêu cầu AI giải thích lỗi của một bài nộp cụ thể
+@router.get("/{submission_id}/explain")
+def explain_submission_error(submission_id: int, db: Session = Depends(get_db)):
+    # 1. Tìm bài nộp trong Database
+    submission = db.query(Submission).filter(Submission.id == submission_id).first()
+    
+    if not submission:
+        return {"message": "Không tìm thấy bài nộp này."}
+        
+    # 2. Kiểm tra xem bài có thực sự bị lỗi không
+    if submission.status != SubmissionStatus.RUNTIME_ERROR:
+        return {"message": "Bài nộp này không bị lỗi Runtime Error, code của bạn đang chạy tốt!"}
+        
+    # 3. Gửi source code cho AI đọc và lấy lời giải thích
+    explanation = explain_code_error(submission.source_code)
+    
+    return {
+        "submission_id": submission.id,
+        "ai_explanation": explanation
+    }
