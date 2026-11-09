@@ -20,6 +20,7 @@ class SubmissionResponse(SubmissionBase):
     status: SubmissionStatus
     runtime: Optional[float] = None
     memory: Optional[float] = None
+    error_message: Optional[str] = None
     created_at: datetime
 
     class Config:

@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from sqlalchemy import text, inspect
 from app.db.session import engine
 from app.models.base import Base
 from app.models.problem import Problem

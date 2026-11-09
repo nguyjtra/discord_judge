@@ -6,10 +6,12 @@ from app.models.base import Base
 
 class SubmissionStatus(str, enum.Enum):
     PENDING = "Pending"
+    JUDGING = "Judging"
     ACCEPTED = "Accepted"
     WRONG_ANSWER = "Wrong Answer"
     TIME_LIMIT_EXCEEDED = "TLE"
     RUNTIME_ERROR = "Runtime Error"
+    SYSTEM_ERROR = "SYSTEM_ERROR"
 
 class Submission(Base):
     __tablename__ = "submissions"
@@ -23,6 +25,7 @@ class Submission(Base):
     status: Mapped[SubmissionStatus] = mapped_column(Enum(SubmissionStatus), default=SubmissionStatus.PENDING)
     runtime: Mapped[float] = mapped_column(Float, nullable=True)
     memory: Mapped[float] = mapped_column(Float, nullable=True)
+    error_message: Mapped[str] = mapped_column(Text, nullable=True)
     
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
