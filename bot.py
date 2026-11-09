@@ -39,4 +39,15 @@ async def submit(ctx, problem_id: int, *, code: str):
     ma_bai_nop = ket_qua.json().get("id")
     await ctx.send(f"Đã nộp xong! Mã bài nộp của bạn là: {ma_bai_nop}")
 
+
+
+@bot.command()
+async def explain(ctx, submission_id: int):
+    await ctx.send(f"🔍 AI support #{submission_id}...")
+    ket_qua = requests.get(f"http://127.0.0.1:8000/api/submissions/{submission_id}/explain")
+    if ket_qua.status_code == 200:
+        loi_giai_thich = ket_qua.json().get("ai_explanation")
+        await ctx.send(f"{loi_giai_thich}")
+    else:
+        await ctx.send("❌ Error")
 bot.run(TOKEN)
