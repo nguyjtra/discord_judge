@@ -10,7 +10,7 @@ def process_submission(submission_id: int):
         # 2. Tìm bài nộp trong Database
         submission = db.query(Submission).filter(Submission.id == submission_id).first()
         if not submission:
-            print(f"Lỗi: Không tìm thấy bài nộp ID {submission_id}")
+            print(f"ERROR {submission_id}")
             return
             
         # Cập nhật trạng thái đang chấm
@@ -22,7 +22,7 @@ def process_submission(submission_id: int):
         
         if not test_cases:
             submission.status = SubmissionStatus.SYSTEM_ERROR
-            submission.error_message = "Bài tập này chưa có Test Case."
+            submission.error_message = "ERROR"
             db.commit()
             return
 
@@ -61,7 +61,7 @@ def process_submission(submission_id: int):
         db.commit()
 
     except Exception as e:
-        print(f"Lỗi hệ thống khi chấm bài {submission_id}:", e)
+        print(f"SEVER ERROR {submission_id}:", e)
         # Nếu có lỗi sập server, cố gắng cập nhật DB
         if 'submission' in locals() and submission:
             submission.status = SubmissionStatus.SYSTEM_ERROR
