@@ -107,9 +107,9 @@ async def show_problem(ctx, problem_id: int):
         response = requests.get(f"{API_URL}/problems/{problem_id}")
         if response.status_code == 200:
             p = response.json()
-            msg = f"📝 **Problem {p['id']}: {p['title']}**\n"
+            msg = f"**Problem {p['id']}: {p['title']}**\n"
             msg += f"**Description:**\n{p['description']}\n\n"
-            msg += f"*(Type `*submit {p['id']} <code>` to submit your answer)*"
+            msg += f"*(Type ` *submit {p['id']} <code>` to submit your answer)*"
             await ctx.send(msg)
         elif response.status_code == 404:
             await ctx.send(f"Problem #{problem_id} not found!")
