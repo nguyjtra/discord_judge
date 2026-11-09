@@ -7,8 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 # Khai báo 1 lần dùng mãi mãi
-API_URL = "[http://127.0.0.1:8000/api](http://127.0.0.1:8000/api)"
-
+API_URL = "http://127.0.0.1:8000/api"
 # KHỞI TẠO BOT
 intents = discord.Intents.default()
 intents.message_content = True
@@ -78,4 +77,44 @@ async def ticket(ctx, *, description: str):
     except Exception as e:
         await ctx.send("Router problem")
 
+# COMMAND 4: SHOW PROBLEM LIST (*problems)
+@bot.command(name='problems')
+async def list_problems(ctx):
+    await ctx.send("Loading problems...")
+    try:
+        response = requests.get(f"{API_URL}/problems/")
+        if response.status_code == 200:
+            problem_list = response.json()
+            if not problem_list:
+                await ctx.send("No problems found!")
+                return
+                
+            msg = "📚 **PROBLEM LIST:**\n"
+            for p in problem_list:
+                difficulty = p.get('difficulty', 'Easy')
+                msg += f"**#{p['id']}** - {p['title']} (Difficulty: {difficulty})\n"
+            msg += "\n*(Type `*problem <id>` to see details)*"
+            await ctx.send(msg)
+        else:
+            await ctx.send("Failed to get data from server.")
+    except Exception as e:
+        await ctx.send("Server connection error.")
+
+# COMMAND 5: SHOW PROBLEM DETAILS (*problem <id>)
+@bot.command(name='problem')
+async def show_problem(ctx, problem_id: int):
+    try:
+        response = requests.get(f"{API_URL}/problems/{problem_id}")
+        if response.status_code == 200:
+            p = response.json()
+            msg = f"📝 **Problem {p['id']}: {p['title']}**\n"
+            msg += f"**Description:**\n{p['description']}\n\n"
+            msg += f"*(Type `*submit {p['id']} <code>` to submit your answer)*"
+            await ctx.send(msg)
+        elif response.status_code == 404:
+            await ctx.send(f"Problem #{problem_id} not found!")
+        else:
+            await ctx.send("Server error.")
+    except Exception as e:
+        await ctx.send("Server connection error.")
 bot.run(TOKEN)

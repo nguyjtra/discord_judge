@@ -18,16 +18,7 @@ def explain_code_error(source_code: str) -> str:
         
         # Khung Prompt chuẩn mực (đóng vai chuyên gia)
         prompt = f"""
-        Bạn là một chuyên gia IT và một gia sư lập trình nhiệt huyết.
-        Học viên vừa nộp đoạn code Python này vào hệ thống và bị báo lỗi RUNTIME_ERROR:
         {source_code}
-
-        Hãy trả lời tôi theo đúng format sau:
-        1. Giải thích nguyên nhân gốc rễ (ngắn gọn, đi thẳng vào vấn đề).
-        2. Chỉ ra dòng code bị sai cụ thể.
-        3. Đưa ra code đã sửa đúng.
-        4. Dặn dò một mẹo nhỏ để tránh lỗi tương tự.
-
         Lưu ý: Luôn trả lời bằng Anh và gỉai thích Đơn giản cho 1 đứa trẻ 5 tuổi.
         """
         
