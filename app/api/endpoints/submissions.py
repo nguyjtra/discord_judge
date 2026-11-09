@@ -20,6 +20,7 @@ def get_db():
 def submit_code(
     submission_in: SubmissionCreate, 
     background_tasks: BackgroundTasks,  # Thêm công cụ chạy ngầm
+    # nén bài tập chạy song song 
     db: Session = Depends(get_db)
 ):
     # 1. Lưu bài nộp vào Database với trạng thái mặc định là Pending
@@ -54,4 +55,3 @@ def explain_submission_error(submission_id: int, db: Session = Depends(get_db)):
         "submission_id": submission.id,
         "ai_explanation": explanation
     }
-    
