@@ -89,7 +89,7 @@ async def list_problems(ctx):
                 await ctx.send("No problems found!")
                 return
                 
-            msg = "📚 **PROBLEM LIST:**\n"
+            msg = "**PROBLEM LIST:**\n"
             for p in problem_list:
                 difficulty = p.get('difficulty', 'Easy')
                 msg += f"**#{p['id']}** - {p['title']} (Difficulty: {difficulty})\n"
