@@ -34,3 +34,14 @@ def get_all_problems(db: Session = Depends(get_db)):
     # Lấy tất cả các dòng trong bảng Problem
     problems = db.query(Problem).all()
     return problems
+
+
+@router.get("/{problem_id}", response_model=ProblemResponse)
+def get_problem_details(problem_id: int, db: Session = Depends(get_db)):
+    # Tìm bài tập có ID khớp với yêu cầu
+    problem = db.query(Problem).filter(Problem.id == problem_id).first()
+    
+    if not problem:
+        raise HTTPException(status_code=404, detail="Không tìm thấy bài tập này!")
+        
+    return problem

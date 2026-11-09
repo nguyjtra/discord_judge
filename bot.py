@@ -2,61 +2,63 @@ import discord
 from discord.ext import commands
 import requests
 import os
-import asyncio
 from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-API_URL = "http://127.0.0.1:8000/api"
+# Khai báo 1 lần dùng mãi mãi
+API_URL = "[http://127.0.0.1:8000/api](http://127.0.0.1:8000/api)"
+
 # KHỞI TẠO BOT
-# 1. Cấp quyền cho bot được phép đọc tin nhắn của mọi người
 intents = discord.Intents.default()
 intents.message_content = True
-# 2. Tạo ra con bot và dặn nó: "Chỉ nghe lệnh nào bắt đầu bằng dấu chấm than (!)"
-bot = commands.Bot(command_prefix='!', intents=intents)
+# Lệnh bắt đầu bằng dấu *
+bot = commands.Bot(command_prefix='*', intents=intents)
+
 # SỰ KIỆN KHI BOT TỈNH DẬY
 @bot.event
 async def on_ready():
-    # In ra màn hình đen (Terminal) của BẠN để bạn biết nó đã sống
     print("let coding!!!")
 
-
-# DẠY BOT CÁCH NHẬN BÀI NỘP
+# LỆNH 1: NHẬN BÀI NỘP
 @bot.command()
 async def submit(ctx, problem_id: int, *, code: str):
-# 1. Bot nhắn lại Discord để người dùng yên tâm chờ đợi
     await ctx.send("Sending Code to FastAPI...")
-# 2. Đóng gói dữ liệu giống hệt như lúc bạn nộp trên web Swagger UI
+    
+    # Dọn dẹp dấu nháy (```python) nếu người dùng dán code có format trên Discord
+    clean_code = code.strip("`")
+    if clean_code.startswith("python"):
+        clean_code = clean_code[6:].strip()
+
     du_lieu = {
-        "user_discord_id": str(ctx.author.id), # Lấy ID Discord của người gửi
+        "user_discord_id": str(ctx.author.id), 
         "problem_id": problem_id,
-        "source_code": code,
+        "source_code": clean_code,
         "language": "python"
     }
-# 3. Ném gói dữ liệu đó vào địa chỉ của FastAPI (POST)
-    ket_qua = requests.post("http://127.0.0.1:8000/api/submissions/", json=du_lieu)
-# 4. Rạch gói hàng API trả về để lấy cái mã số bài nộp
+    
+    # Dùng biến API_URL cho gọn và chuẩn
+    ket_qua = requests.post(f"{API_URL}/submissions/", json=du_lieu)
     ma_bai_nop = ket_qua.json().get("id")
+    
     await ctx.send(f"Success! The submission ID is: {ma_bai_nop}")
 
-
-
+# LỆNH 2: HỎI AI GIẢI THÍCH
 @bot.command()
 async def explain(ctx, submission_id: int):
-    await ctx.send(f"🔍 AI support #{submission_id}...")
-    ket_qua = requests.get(f"http://127.0.0.1:8000/api/submissions/{submission_id}/explain")
+    await ctx.send(f"AI support #{submission_id}...")
+    ket_qua = requests.get(f"{API_URL}/submissions/{submission_id}/explain ")
+    
     if ket_qua.status_code == 200:
         loi_giai_thich = ket_qua.json().get("ai_explanation")
         await ctx.send(f"{loi_giai_thich}")
     else:
-        await ctx.send("❌ Error")
+        await ctx.send("Error")
 
-
-
+# LỆNH 3: BÁO LỖI (TICKET)
 @bot.command()
 async def ticket(ctx, *, description: str):
-    """use this comman to report issue :!ticket <.......>"""
-    
+    """use this command to report issue : *ticket <.......>"""
     await ctx.send("Sending...")
     
     du_lieu = {
@@ -65,7 +67,7 @@ async def ticket(ctx, *, description: str):
     }
     
     try:
-        ket_qua = requests.post("http://127.0.0.1:8000/api/tickets/", json=du_lieu)
+        ket_qua = requests.post(f"{API_URL}/tickets/", json=du_lieu)
         
         if ket_qua.status_code == 200:
             ticket_id = ket_qua.json().get("id")
