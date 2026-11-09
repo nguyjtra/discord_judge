@@ -93,7 +93,6 @@ async def list_problems(ctx):
             for p in problem_list:
                 difficulty = p.get('difficulty', 'Easy')
                 msg += f"**#{p['id']}** - {p['title']} (Difficulty: {difficulty})\n"
-            msg += "\n*(Type `*problem <id>` to see details)*"
             await ctx.send(msg)
         else:
             await ctx.send("Failed to get data from server.")
