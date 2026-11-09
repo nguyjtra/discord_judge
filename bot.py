@@ -25,7 +25,7 @@ async def on_ready():
 @bot.command()
 async def submit(ctx, problem_id: int, *, code: str):
 # 1. Bot nhắn lại Discord để người dùng yên tâm chờ đợi
-    await ctx.send("Đang cầm code của bạn chạy sang giao cho FastAPI...")
+    await ctx.send("Sending Code to FastAPI...")
 # 2. Đóng gói dữ liệu giống hệt như lúc bạn nộp trên web Swagger UI
     du_lieu = {
         "user_discord_id": str(ctx.author.id), # Lấy ID Discord của người gửi
@@ -37,7 +37,7 @@ async def submit(ctx, problem_id: int, *, code: str):
     ket_qua = requests.post("http://127.0.0.1:8000/api/submissions/", json=du_lieu)
 # 4. Rạch gói hàng API trả về để lấy cái mã số bài nộp
     ma_bai_nop = ket_qua.json().get("id")
-    await ctx.send(f"Đã nộp xong! Mã bài nộp của bạn là: {ma_bai_nop}")
+    await ctx.send(f"Success! The submission ID is: {ma_bai_nop}")
 
 
 
@@ -50,4 +50,30 @@ async def explain(ctx, submission_id: int):
         await ctx.send(f"{loi_giai_thich}")
     else:
         await ctx.send("❌ Error")
+
+
+
+@bot.command()
+async def ticket(ctx, *, description: str):
+    """use this comman to report issue :!ticket <.......>"""
+    
+    await ctx.send("Sending...")
+    
+    du_lieu = {
+        "user_discord_id": str(ctx.author.id),
+        "issue_description": description
+    }
+    
+    try:
+        ket_qua = requests.post("http://127.0.0.1:8000/api/tickets/", json=du_lieu)
+        
+        if ket_qua.status_code == 200:
+            ticket_id = ket_qua.json().get("id")
+            await ctx.send(f"Your Ticket number is `TICKET-#{ticket_id}`.")
+        else:
+            await ctx.send("System Error")
+            
+    except Exception as e:
+        await ctx.send("Router problem")
+
 bot.run(TOKEN)
