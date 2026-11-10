@@ -42,22 +42,22 @@ async def submit(ctx, problem_id: int, *, code: str):
         ma_bai_nop = ket_qua.json().get("id")
         await ctx.send(f"Success! The submission ID is: {ma_bai_nop}")
         for _ in range(15):
-                await asyncio.sleep(2)
-                check = requests.get(f"{API_URL}/submissions/{ma_bai_nop}")
-                if check.status_code == 200:
-                    trang_thai = check.json().get("status")
-                    if trang_thai != "PENDING":
-                        user_tag = f"<@{ctx.author.id}>"
-                        if trang_thai == "ACCEPTED":
-                            await ctx.send(f"{user_tag} ACCEPTED")
-                        elif trang_thai == "WRONG_ANSWER":
-                            await ctx.send(f"{user_tag}  **#{ma_bai_nop}**: **WRONG ANSWER.**\n*(`*explain {ma_bai_nop}` for AI assist)*")
-                        else:
-                            await ctx.send(f"{user_tag}  **#{ma_bai_nop}**: **Error.**\n*(`*explain {ma_bai_nop}` for AI assist)* ")
-                        return
-        await ctx.send (f"RUN TIME ERROR")
+            await asyncio.sleep(2)
+            check = requests.get(f"{API_URL}/submissions/{ma_bai_nop}")
+            if check.status_code == 200:
+                trang_thai = check.json().get("status")
+                if trang_thai not in ("Pending", "Judging", "PENDING", "JUDGING"):
+                    user_tag = f"<@{ctx.author.id}>"
+                    if trang_thai in ("Accepted", "ACCEPTED"):
+                        await ctx.send(f"{user_tag} **#{ma_bai_nop}**: **ACCEPTED**")
+                    elif trang_thai in ("Wrong Answer", "WRONG_ANSWER"):
+                        await ctx.send(f"{user_tag} **#{ma_bai_nop}**: **WRONG ANSWER.**\n*(`*explain {ma_bai_nop}` for AI assist)*")
+                    else:
+                        await ctx.send(f"{user_tag} **#{ma_bai_nop}**: **{trang_thai}.**\n*(`*explain {ma_bai_nop}` for AI assist)*")
+                    return
+        await ctx.send("Timeout waiting for judge result.")
     else:
-        await ctx.send(f"Error when submit explain {ma_bai_nop} for AI assist")
+        await ctx.send("Error when submitting code.")
 # LỆNH 2: HỎI AI GIẢI THÍCH
 @bot.command()
 async def explain(ctx, submission_id: int):

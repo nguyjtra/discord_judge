@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, BackgroundTasks
+from fastapi import APIRouter, Depends, BackgroundTasks, HTTPException
 from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
 from app.models.submission import Submission
@@ -33,6 +33,13 @@ def submit_code(
     background_tasks.add_task(process_submission, new_submission.id)
     
     return new_submission
+
+@router.get("/{submission_id}", response_model=SubmissionResponse)
+def get_submission(submission_id: int, db: Session = Depends(get_db)):
+    submission = db.query(Submission).filter(Submission.id == submission_id).first()
+    if not submission:
+        raise HTTPException(status_code=404, detail="ID not found.")
+    return submission
 
 # API MỚI: Yêu cầu AI giải thích lỗi của một bài nộp cụ thể
 @router.get("/{submission_id}/explain")
