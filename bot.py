@@ -38,10 +38,26 @@ async def submit(ctx, problem_id: int, *, code: str):
     
     # Dùng biến API_URL cho gọn và chuẩn
     ket_qua = requests.post(f"{API_URL}/submissions/", json=du_lieu)
-    ma_bai_nop = ket_qua.json().get("id")
-    
-    await ctx.send(f"Success! The submission ID is: {ma_bai_nop}")
-
+    if ket_qua.status_code == 200:
+        ma_bai_nop = ket_qua.json().get("id")
+        await ctx.send(f"Success! The submission ID is: {ma_bai_nop}")
+        for _ in range(15):
+                await asyncio.sleep(2)
+                check = requests.get(f"{API_URL}/submissions/{ma_bai_nop}")
+                if check.status_code == 200:
+                    trang_thai = check.json().get("status")
+                    if trang_thai != "PENDING":
+                        user_tag = f"<@{ctx.author.id}>"
+                        if trang_thai == "ACCEPTED":
+                            await ctx.send(f"{user_tag} ACCEPTED")
+                        elif trang_thai == "WRONG_ANSWER":
+                            await ctx.send(f"{user_tag}  **#{ma_bai_nop}**: **WRONG ANSWER.**\n*(`*explain {ma_bai_nop}` for AI assist)*")
+                        else:
+                            await ctx.send(f"{user_tag}  **#{ma_bai_nop}**: **Error.**\n*(`*explain {ma_bai_nop}` for AI assist)* ")
+                        return
+        await ctx.send (f"RUN TIME ERROR")
+    else:
+        await ctx.send(f"Error when submit explain {ma_bai_nop} for AI assist")
 # LỆNH 2: HỎI AI GIẢI THÍCH
 @bot.command()
 async def explain(ctx, submission_id: int):
