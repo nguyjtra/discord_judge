@@ -42,13 +42,7 @@ def explain_submission_error(submission_id: int, db: Session = Depends(get_db)):
     submission = db.query(Submission).filter(Submission.id == submission_id).first()
     
     if not submission:
-        return {"message": "Không tìm thấy bài nộp này."}
-        
-    # 2. Kiểm tra xem bài có thực sự bị lỗi không
-    if submission.status != SubmissionStatus.RUNTIME_ERROR:
-        return {"message": "Bài nộp này không bị lỗi Runtime Error, code của bạn đang chạy tốt!"}
-        
-    # 3. Gửi source code cho AI đọc và lấy lời giải thích
+        return {"message": "Error"}
     explanation = explain_code_error(submission.source_code)
     
     return {

@@ -15,10 +15,9 @@ def explain_code_error(source_code: str) -> str:
     """
     try:
         model = genai.GenerativeModel("gemini-3.5-flash-lite")
-        
-        # Khung Prompt chuẩn mực (đóng vai chuyên gia)
         prompt = f"""
         {source_code}
+        trả lời ngắn gọn
         Lưu ý: Luôn trả lời bằng Anh và gỉai thích Đơn giản cho 1 đứa trẻ 5 tuổi.
         """
         

@@ -46,13 +46,19 @@ async def submit(ctx, problem_id: int, *, code: str):
 @bot.command()
 async def explain(ctx, submission_id: int):
     await ctx.send(f"AI support #{submission_id}...")
-    ket_qua = requests.get(f"{API_URL}/submissions/{submission_id}/explain ")
-    
-    if ket_qua.status_code == 200:
-        loi_giai_thich = ket_qua.json().get("ai_explanation")
-        await ctx.send(f"{loi_giai_thich}")
-    else:
-        await ctx.send("Error")
+    try:
+        ket_qua = requests.get(f"{API_URL}/submissions/{submission_id}/explain")
+        if ket_qua.status_code == 200:
+            data = ket_qua.json()
+            noi_dung = data.get("ai_explanation") or data.get("message") or "No response from AI."
+            # Giới hạn 2000 ký tự của Discord
+            if len(noi_dung) > 1900:
+                noi_dung = noi_dung[:1900] + "\n...(truncated)"
+            await ctx.send(noi_dung)
+        else:
+            await ctx.send(f"Error (HTTP {ket_qua.status_code})")
+    except Exception as e:
+        await ctx.send("Server connection error.")
 
 # LỆNH 3: BÁO LỖI (TICKET)
 @bot.command()
