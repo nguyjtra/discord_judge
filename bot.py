@@ -51,7 +51,6 @@ async def explain(ctx, submission_id: int):
         if ket_qua.status_code == 200:
             data = ket_qua.json()
             noi_dung = data.get("ai_explanation") or data.get("message") or "No response from AI."
-            # Giới hạn 2000 ký tự của Discord
             if len(noi_dung) > 1900:
                 noi_dung = noi_dung[:1900] + "\n...(truncated)"
             await ctx.send(noi_dung)

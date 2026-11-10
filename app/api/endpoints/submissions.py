@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
-
 from app.db.session import SessionLocal
 from app.models.submission import Submission
 from app.schemas.submission import SubmissionCreate, SubmissionResponse
@@ -40,11 +39,9 @@ def submit_code(
 def explain_submission_error(submission_id: int, db: Session = Depends(get_db)):
     # 1. Tìm bài nộp trong Database
     submission = db.query(Submission).filter(Submission.id == submission_id).first()
-    
     if not submission:
         return {"message": "Error"}
     explanation = explain_code_error(submission.source_code)
-    
     return {
         "submission_id": submission.id,
         "ai_explanation": explanation

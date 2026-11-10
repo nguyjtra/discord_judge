@@ -18,6 +18,7 @@ def explain_code_error(source_code: str) -> str:
         prompt = f"""
         {source_code}
         trả lời ngắn gọn
+        và giải thích từng dòng code 
         Lưu ý: Luôn trả lời bằng Anh và gỉai thích Đơn giản cho 1 đứa trẻ 5 tuổi.
         """
         
