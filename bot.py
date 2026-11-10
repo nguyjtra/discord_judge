@@ -3,7 +3,7 @@ from discord.ext import commands
 import requests
 import os
 from dotenv import load_dotenv
-
+import asyncio
 load_dotenv()
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 # Khai báo 1 lần dùng mãi mãi
