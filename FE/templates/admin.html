@@ -15,7 +15,6 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="/asset/css/prism.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -155,9 +154,7 @@
         "imports": {
           "alpinejs": "https://esm.sh/alpinejs@3.14.8",
           "@alpinejs/persist": "https://esm.sh/@alpinejs/persist@3.14.8?external=alpinejs",
-          "@alpinejs/collapse": "https://esm.sh/@alpinejs/collapse@3.14.8?external=alpinejs",
-          "@tanstack/alpine-table": "https://esm.sh/@tanstack/alpine-table@8.20.5?external=alpinejs",
-          "@floating-ui/dom": "https://esm.sh/@floating-ui/dom@1.6.12"
+          "@alpinejs/collapse": "https://esm.sh/@alpinejs/collapse@3.14.8?external=alpinejs"
         }
       }
     </script>
@@ -165,46 +162,10 @@
       import Alpine from "alpinejs";
       import persist from "@alpinejs/persist";
       import collapse from "@alpinejs/collapse";
-      import dropdown from "/asset/js/components/ui/dropdown.js";
-      import popover from "/asset/js/components/ui/popover.js";
-      import tooltip from "/asset/js/components/ui/tooltip.js";
-
-      const res = await fetch("/asset/locales/en/common.json");
-      const translations = res.ok ? await res.json() : {};
-      const getByPath = (obj, path) =>
-        String(path || "")
-          .split(".")
-          .reduce((acc, k) => (acc && acc[k] !== undefined ? acc[k] : undefined), obj) ?? path;
 
       Alpine.plugin(persist);
       Alpine.plugin(collapse);
       window.Alpine = Alpine;
-
-      Alpine.store("i18n", {
-        currentLocale: "en",
-        dir: "ltr",
-        locales: [
-          {
-            code: "en",
-            name: "English",
-            shortName: "English",
-            country: "USA",
-            flag: "/images/flag/flag-us.svg",
-          },
-        ],
-        get currentLang() {
-          return this.locales[0];
-        },
-        t(key) {
-          return getByPath(translations, key);
-        },
-        setLocale() {},
-      });
-      Alpine.magic("t", () => (key) => getByPath(translations, key));
-
-      Alpine.data("dropdown", dropdown);
-      Alpine.data("popover", popover);
-      Alpine.data("tooltip", tooltip);
 
       Alpine.data("adminApp", () => ({
         page: "adminDashboard",
