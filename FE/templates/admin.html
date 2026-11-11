@@ -16,8 +16,140 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/asset/css/prism.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style type="text/tailwindcss" id="tailadmin-style"></style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              outfit: ["Outfit", "sans-serif"],
+              sans: ["Outfit", "sans-serif"],
+            },
+            colors: {
+              brand: {
+                50: "#ecf3ff",
+                100: "#dde9ff",
+                200: "#c2d6ff",
+                300: "#9cb9ff",
+                400: "#7592ff",
+                500: "#465fff",
+                600: "#3641f5",
+                700: "#2a31d8",
+                800: "#252dae",
+                900: "#262e89",
+                950: "#161950",
+              },
+            },
+            boxShadow: {
+              "theme-xs": "0px 1px 2px 0px rgba(16, 24, 40, 0.05)",
+              "theme-sm": "0px 1px 3px 0px rgba(16, 24, 40, 0.1), 0px 1px 2px 0px rgba(16, 24, 40, 0.06)",
+              "theme-md": "0px 4px 8px -2px rgba(16, 24, 40, 0.1), 0px 2px 4px -2px rgba(16, 24, 40, 0.06)",
+              "theme-lg": "0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)",
+              "theme-xl": "0px 20px 24px -4px rgba(16, 24, 40, 0.08), 0px 8px 8px -4px rgba(16, 24, 40, 0.03)",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+      body {
+        font-family: "Outfit", sans-serif;
+        background-color: #f9fafb;
+      }
+      .dark body,
+      body.dark {
+        background-color: #111827;
+      }
+      .menu-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-radius: 0.5rem;
+        padding: 0.625rem 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.15s ease;
+      }
+      .menu-item-active {
+        background-color: #ecf3ff;
+        color: #465fff;
+      }
+      .dark .menu-item-active {
+        background-color: rgba(70, 95, 255, 0.15);
+        color: #7592ff;
+      }
+      .menu-item-inactive {
+        color: #374151;
+      }
+      .menu-item-inactive:hover {
+        background-color: #f3f4f6;
+      }
+      .dark .menu-item-inactive {
+        color: #d1d5db;
+      }
+      .dark .menu-item-inactive:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+      .menu-item-icon-active {
+        color: #465fff;
+      }
+      .dark .menu-item-icon-active {
+        color: #7592ff;
+      }
+      .menu-item-icon-inactive {
+        color: #6b7280;
+      }
+      .dark .menu-item-icon-inactive {
+        color: #9ca3af;
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .w-72\.5 {
+        width: 18rem;
+      }
+      .z-99 {
+        z-index: 99;
+      }
+      .z-999 {
+        z-index: 999;
+      }
+      .z-9999 {
+        z-index: 9999;
+      }
+      .z-99999 {
+        z-index: 99999;
+      }
+      .z-999999 {
+        z-index: 999999;
+      }
+      .backdrop-blur-xs {
+        backdrop-filter: blur(4px);
+      }
+      .outline-hidden {
+        outline: none;
+      }
+      .dark .dark\:bg-white\/3 {
+        background-color: rgba(255, 255, 255, 0.03);
+      }
+      @media (min-width: 1280px) {
+        .xl\:w-22\.5 {
+          width: 5.625rem;
+        }
+        .xl\:w-107\.5 {
+          width: 26.875rem;
+        }
+      }
+    </style>
     <script type="importmap">
       {
         "imports": {
@@ -408,7 +540,7 @@
         <!-- ===== Main Content Start ===== -->
         <main id="main-content">
           <div
-            class="mx-auto max-w-(--breakpoint-2xl) p-4 pb-20 md:p-6 md:pb-10 space-y-6"
+            class="mx-auto max-w-7xl p-4 pb-20 md:p-6 md:pb-10 space-y-6"
           >
             <!-- Top Bar & Quick Actions -->
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

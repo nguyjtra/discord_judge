@@ -48,18 +48,6 @@ def startup_db():
 @app.get("/admin", response_class=HTMLResponse)
 def admin_dashboard():
     html = render_with_includes(FE_DIR / "templates" / "admin.html")
-    style_path = FE_DIR / "asset" / "css" / "style.css"
-    if style_path.exists():
-        raw_css = style_path.read_text(encoding="utf-8")
-        # Lọc bỏ 2 dòng plugin Node để trình duyệt biên dịch trực tiếp style.css
-        browser_css = "\n".join(
-            line for line in raw_css.splitlines()
-            if not line.strip().startswith(('@import "tw-animate-css"', '@plugin "@tailwindcss/forms"', '@import url('))
-        )
-        html = html.replace(
-            '<style type="text/tailwindcss" id="tailadmin-style"></style>',
-            f'<style type="text/tailwindcss" id="tailadmin-style">\n{browser_css}\n</style>',
-        )
     return HTMLResponse(content=html)
 
 @app.get("/")
