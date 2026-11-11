@@ -7,14 +7,19 @@
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Discord Judge Admin | Problems &amp; IT Tickets</title>
+    <title>Discord Judge — Editorial Admin Console</title>
     <link rel="icon" href="/images/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+    <script>
+      if (JSON.parse(localStorage.getItem("darkMode") || "false") === true) {
+        document.documentElement.classList.add("dark");
+      }
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -22,30 +27,30 @@
         theme: {
           extend: {
             fontFamily: {
-              outfit: ["Outfit", "sans-serif"],
-              sans: ["Outfit", "sans-serif"],
+              serif: ['"Playfair Display"', "Georgia", "serif"],
+              sans: ['"Plus Jakarta Sans"', "system-ui", "sans-serif"],
+              mono: ['"JetBrains Mono"', "ui-monospace", "monospace"],
             },
             colors: {
-              brand: {
-                50: "#ecf3ff",
-                100: "#dde9ff",
-                200: "#c2d6ff",
-                300: "#9cb9ff",
-                400: "#7592ff",
-                500: "#465fff",
-                600: "#3641f5",
-                700: "#2a31d8",
-                800: "#252dae",
-                900: "#262e89",
-                950: "#161950",
-              },
-            },
-            boxShadow: {
-              "theme-xs": "0px 1px 2px 0px rgba(16, 24, 40, 0.05)",
-              "theme-sm": "0px 1px 3px 0px rgba(16, 24, 40, 0.1), 0px 1px 2px 0px rgba(16, 24, 40, 0.06)",
-              "theme-md": "0px 4px 8px -2px rgba(16, 24, 40, 0.1), 0px 2px 4px -2px rgba(16, 24, 40, 0.06)",
-              "theme-lg": "0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03)",
-              "theme-xl": "0px 20px 24px -4px rgba(16, 24, 40, 0.08), 0px 8px 8px -4px rgba(16, 24, 40, 0.03)",
+              paper: "#F6F4EF",
+              sheet: "#FBF9F5",
+              wash: "#EFECE4",
+              rail: "#F1EEE7",
+              rule: "#E2DDD3",
+              ink: "#1C1B18",
+              muted: "#6E6A61",
+              subtle: "#9A9488",
+              obsidian: "#141413",
+              graphite: "#1B1B19",
+              inkrail: "#181816",
+              inkline: "#2C2B27",
+              ivory: "#EAE6DD",
+              ash: "#9B968B",
+              sienna: "#B4532A",
+              forest: "#2E5A44",
+              ochre: "#9A6B2F",
+              steel: "#3B5B75",
+              burgundy: "#8B2635",
             },
           },
         },
@@ -56,55 +61,53 @@
         display: none !important;
       }
       body {
-        font-family: "Outfit", sans-serif;
-        background-color: #f9fafb;
+        font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+        background-color: #f6f4ef;
+        color: #1c1b18;
+        -webkit-font-smoothing: antialiased;
       }
-      .dark body,
+      html.dark body,
       body.dark {
-        background-color: #111827;
+        background-color: #141413;
+        color: #eae6dd;
       }
       .menu-item {
         position: relative;
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        border-radius: 0.5rem;
-        padding: 0.625rem 0.75rem;
-        font-size: 0.875rem;
+        padding: 0.55rem 0.625rem;
+        font-size: 0.84rem;
         font-weight: 500;
-        transition: all 0.15s ease;
+        border-left: 2px solid transparent;
+        transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
       }
       .menu-item-active {
-        background-color: #ecf3ff;
-        color: #465fff;
+        border-left-color: #1c1b18;
+        background-color: #e9e4d9;
+        color: #1c1b18;
       }
+      html.dark .menu-item-active,
       .dark .menu-item-active {
-        background-color: rgba(70, 95, 255, 0.15);
-        color: #7592ff;
+        border-left-color: #eae6dd;
+        background-color: #23221e;
+        color: #eae6dd;
       }
       .menu-item-inactive {
-        color: #374151;
+        color: #6e6a61;
       }
       .menu-item-inactive:hover {
-        background-color: #f3f4f6;
+        background-color: rgba(28, 27, 24, 0.04);
+        color: #1c1b18;
       }
+      html.dark .menu-item-inactive,
       .dark .menu-item-inactive {
-        color: #d1d5db;
+        color: #9b968b;
       }
+      html.dark .menu-item-inactive:hover,
       .dark .menu-item-inactive:hover {
-        background-color: rgba(255, 255, 255, 0.05);
-      }
-      .menu-item-icon-active {
-        color: #465fff;
-      }
-      .dark .menu-item-icon-active {
-        color: #7592ff;
-      }
-      .menu-item-icon-inactive {
-        color: #6b7280;
-      }
-      .dark .menu-item-icon-inactive {
-        color: #9ca3af;
+        background-color: rgba(234, 230, 221, 0.05);
+        color: #eae6dd;
       }
       .no-scrollbar::-webkit-scrollbar {
         display: none;
@@ -113,14 +116,11 @@
         -ms-overflow-style: none;
         scrollbar-width: none;
       }
-      .w-72\.5 {
-        width: 18rem;
+      .w-68 {
+        width: 16.5rem;
       }
       .z-99 {
         z-index: 99;
-      }
-      .z-999 {
-        z-index: 999;
       }
       .z-9999 {
         z-index: 9999;
@@ -133,20 +133,6 @@
       }
       .backdrop-blur-xs {
         backdrop-filter: blur(4px);
-      }
-      .outline-hidden {
-        outline: none;
-      }
-      .dark .dark\:bg-white\/3 {
-        background-color: rgba(255, 255, 255, 0.03);
-      }
-      @media (min-width: 1280px) {
-        .xl\:w-22\.5 {
-          width: 5.625rem;
-        }
-        .xl\:w-107\.5 {
-          width: 26.875rem;
-        }
       }
     </style>
     <script type="importmap">
@@ -167,10 +153,49 @@
       Alpine.plugin(collapse);
       window.Alpine = Alpine;
 
+      const TONE_MAP = {
+        forest: {
+          dot: "bg-[#2E5A44] dark:bg-[#7CA98E]",
+          bar: "bg-[#2E5A44] dark:bg-[#7CA98E]",
+          text: "text-[#2E5A44] dark:text-[#7CA98E]",
+        },
+        ochre: {
+          dot: "bg-[#9A6B2F] dark:bg-[#D4A362]",
+          bar: "bg-[#9A6B2F] dark:bg-[#D4A362]",
+          text: "text-[#9A6B2F] dark:text-[#D4A362]",
+        },
+        steel: {
+          dot: "bg-[#3B5B75] dark:bg-[#84A8C4]",
+          bar: "bg-[#3B5B75] dark:bg-[#84A8C4]",
+          text: "text-[#3B5B75] dark:text-[#84A8C4]",
+        },
+        burgundy: {
+          dot: "bg-[#8B2635] dark:bg-[#D47A86]",
+          bar: "bg-[#8B2635] dark:bg-[#D47A86]",
+          text: "text-[#8B2635] dark:text-[#D47A86]",
+        },
+      };
+
+      const STATUS_TONE_LOOKUP = {
+        accepted: "forest",
+        resolved: "forest",
+        easy: "forest",
+        pending: "ochre",
+        judging: "ochre",
+        open: "ochre",
+        medium: "ochre",
+        "in-progress": "steel",
+        "wrong answer": "burgundy",
+        tle: "burgundy",
+        "runtime error": "burgundy",
+        system_error: "burgundy",
+        hard: "burgundy",
+      };
+
       Alpine.data("adminApp", () => ({
         page: "adminDashboard",
         loaded: false,
-        darkMode: JSON.parse(localStorage.getItem("darkMode")) ?? false,
+        darkMode: JSON.parse(localStorage.getItem("darkMode") || "false"),
         stickyMenu: false,
         sidebarToggle: false,
         scrollTop: false,
@@ -216,9 +241,11 @@
         selectedSubmission: null,
 
         init() {
-          this.$watch("darkMode", (value) =>
-            localStorage.setItem("darkMode", JSON.stringify(value))
-          );
+          document.documentElement.classList.toggle("dark", this.darkMode);
+          this.$watch("darkMode", (value) => {
+            document.documentElement.classList.toggle("dark", value);
+            localStorage.setItem("darkMode", JSON.stringify(value));
+          });
           this.fetchAllData();
         },
 
@@ -270,8 +297,16 @@
 
         get acceptedSubmissionsCount() {
           return this.submissions.filter(
-            (s) => s.status === "Accepted" || s.status === "ACCEPTED"
+            (s) => String(s.status || "").toLowerCase() === "accepted"
           ).length;
+        },
+
+        get acceptanceRateLabel() {
+          if (!this.submissions.length) return "No submissions recorded";
+          const pct = Math.round(
+            (this.acceptedSubmissionsCount / this.submissions.length) * 100
+          );
+          return `${pct}% pass rate across last ${this.submissions.length} runs`;
         },
 
         get filteredProblems() {
@@ -298,6 +333,35 @@
               (t.issue_description || "").toLowerCase().includes(q)
             );
           });
+        },
+
+        get filteredSubmissions() {
+          const q = this.searchQuery.trim().toLowerCase();
+          if (!q) return this.submissions;
+          return this.submissions.filter(
+            (s) =>
+              String(s.id).includes(q) ||
+              String(s.problem_id).includes(q) ||
+              (s.user_discord_id || "").toLowerCase().includes(q) ||
+              (s.status || "").toLowerCase().includes(q)
+          );
+        },
+
+        getTone(value) {
+          const key = String(value || "").trim().toLowerCase();
+          return TONE_MAP[STATUS_TONE_LOOKUP[key] || "ochre"];
+        },
+
+        statusDotClass(value) {
+          return this.getTone(value).dot;
+        },
+
+        rowAccentClass(value) {
+          return this.getTone(value).bar;
+        },
+
+        statusTextClass(value) {
+          return this.getTone(value).text;
         },
 
         // --- PROBLEM CRUD ---
@@ -351,9 +415,7 @@
             this.problemModalOpen = false;
             await this.fetchProblems();
             this.showToast(
-              this.isEditingProblem
-                ? "✅ Problem updated!"
-                : "✅ New problem added!"
+              this.isEditingProblem ? "Problem updated" : "Problem added"
             );
           } else {
             alert("Failed to save problem!");
@@ -366,7 +428,7 @@
           if (r.ok) {
             await this.fetchProblems();
             await this.fetchSubmissions();
-            this.showToast(`🗑️ Deleted Problem #${id}`);
+            this.showToast(`Removed Problem #${id}`);
           }
         },
 
@@ -398,7 +460,7 @@
           if (r.ok) {
             this.newTestCase = { input_data: "", expected_output: "" };
             await this.fetchTestCases(this.selectedProblem.id);
-            this.showToast("✅ Test case added!");
+            this.showToast("Test case added");
           }
         },
 
@@ -408,7 +470,7 @@
           });
           if (r.ok && this.selectedProblem) {
             await this.fetchTestCases(this.selectedProblem.id);
-            this.showToast("🗑️ Test case deleted!");
+            this.showToast("Test case removed");
           }
         },
 
@@ -421,7 +483,7 @@
           });
           if (r.ok) {
             await this.fetchTickets();
-            this.showToast(`✅ Ticket #${ticketId} -> ${newStatus}`);
+            this.showToast(`Ticket #${ticketId} marked ${newStatus}`);
           }
         },
 
@@ -436,7 +498,7 @@
             this.ticketModalOpen = false;
             this.ticketForm.issue_description = "";
             await this.fetchTickets();
-            this.showToast("✅ New IT Ticket created!");
+            this.showToast("IT ticket logged");
           }
         },
 
@@ -447,7 +509,7 @@
           });
           if (r.ok) {
             await this.fetchTickets();
-            this.showToast(`🗑️ Deleted Ticket #${ticketId}`);
+            this.showToast(`Removed Ticket #${ticketId}`);
           }
         },
 
@@ -456,10 +518,65 @@
           this.submissionModalOpen = true;
         },
 
-        formatDate(dtStr) {
-          if (!dtStr) return "-";
-          const d = new Date(dtStr);
-          return isNaN(d.getTime()) ? dtStr : d.toLocaleString("en-US");
+        parseUtcDate(dtStr) {
+          if (!dtStr) return null;
+          const raw = String(dtStr).trim();
+          const hasZone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(raw);
+          const parsed = new Date(hasZone ? raw : `${raw}Z`);
+          return isNaN(parsed.getTime()) ? null : parsed;
+        },
+
+        formatRelativeTime(dtStr) {
+          const d = this.parseUtcDate(dtStr);
+          if (!d) return dtStr || "—";
+
+          const now = new Date();
+          const diffMs = now.getTime() - d.getTime();
+          if (diffMs < 0) return "Just now";
+
+          const diffSec = Math.floor(diffMs / 1000);
+          if (diffSec < 45) return "Just now";
+
+          const diffMins = Math.floor(diffSec / 60);
+          if (diffMins < 60) {
+            return diffMins === 1 ? "1 min ago" : `${diffMins} mins ago`;
+          }
+
+          const startOfToday = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate()
+          );
+          const startOfDate = new Date(
+            d.getFullYear(),
+            d.getMonth(),
+            d.getDate()
+          );
+          const dayDiff = Math.round(
+            (startOfToday.getTime() - startOfDate.getTime()) / 86400000
+          );
+
+          if (dayDiff === 0) {
+            const diffHours = Math.floor(diffMins / 60);
+            return diffHours === 1 ? "1 hour ago" : `${diffHours} hours ago`;
+          }
+          if (dayDiff === 1) return "Yesterday";
+          if (dayDiff >= 2 && dayDiff <= 6) return `${dayDiff} days ago`;
+          if (dayDiff >= 7 && dayDiff <= 13) return "Last week";
+          if (dayDiff >= 14 && dayDiff < 30) {
+            return `${Math.floor(dayDiff / 7)} weeks ago`;
+          }
+
+          return d.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            ...(d.getFullYear() !== now.getFullYear() ? { year: "numeric" } : {}),
+          });
+        },
+
+        formatExactDate(dtStr) {
+          const d = this.parseUtcDate(dtStr);
+          return d ? d.toLocaleString("en-US") : dtStr || "";
         },
       }));
 
@@ -469,20 +586,22 @@
   </head>
   <body
     x-data="adminApp()"
-    :class="{'dark bg-gray-900': darkMode === true}"
+    class="bg-[#F6F4EF] text-[#1C1B18] dark:bg-[#141413] dark:text-[#EAE6DD]"
   >
     <!-- ===== Preloader Start ===== -->
     <include src="./partials/common/preloader.html"></include>
     <!-- ===== Preloader End ===== -->
 
-    <!-- Toast Notification -->
+    <!-- Minimalist Editorial Toast -->
     <div
       x-cloak
       x-show="toastMessage"
-      x-transition
-      class="fixed bottom-5 right-5 z-999999 rounded-xl bg-gray-900 px-4 py-3 text-sm font-medium text-white shadow-theme-lg dark:bg-brand-500"
-      x-text="toastMessage"
-    ></div>
+      x-transition.opacity
+      class="fixed right-6 bottom-6 z-999999 flex items-center gap-2.5 border border-[#2C2B27] bg-[#1C1B18] px-4 py-2.5 font-mono text-xs tracking-wide text-[#F6F4EF] dark:border-[#EAE6DD]/20 dark:bg-[#EAE6DD] dark:text-[#141413]"
+    >
+      <span class="h-1.5 w-1.5 rounded-full bg-[#7CA98E] dark:bg-[#2E5A44]"></span>
+      <span x-text="toastMessage"></span>
+    </div>
 
     <!-- ===== Page Wrapper Start ===== -->
     <div class="flex h-screen overflow-hidden">
@@ -491,310 +610,249 @@
       <!-- ===== Sidebar End ===== -->
 
       <!-- ===== Content Area Start ===== -->
-      <div
-        class="relative flex flex-1 flex-col overflow-x-hidden overflow-y-auto"
-      >
+      <div class="relative flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
         <!-- ===== Header Start ===== -->
         <include src="./partials/layout/app-layout/header/index.html" />
         <!-- ===== Header End ===== -->
 
         <!-- ===== Main Content Start ===== -->
-        <main id="main-content">
-          <div
-            class="mx-auto max-w-7xl p-4 pb-20 md:p-6 md:pb-10 space-y-6"
-          >
-            <!-- Top Bar & Quick Actions -->
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                  Discord Judge — Admin Dashboard
-                </h1>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Manage coding problems (Add / Edit / Delete), test cases, and Discord IT support tickets.
+        <main id="main-content" class="flex-1">
+          <div class="mx-auto max-w-[1360px] px-5 pt-8 pb-24 md:px-10 md:pt-12 space-y-16">
+            <!-- ==================== MASTHEAD ==================== -->
+            <section class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+              <div class="space-y-2">
+                <p class="font-mono text-[11px] tracking-[0.18em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
+                  Issue Ledger &amp; Sandbox Telemetry
                 </p>
+                <h1 class="font-serif text-4xl leading-none font-normal tracking-tight text-[#1C1B18] sm:text-5xl dark:text-[#EAE6DD]">
+                  Judge <span class="italic text-[#6E6A61] dark:text-[#9B968B]">Operations</span>
+                </h1>
               </div>
-              <div class="flex flex-wrap items-center gap-2.5">
+
+              <div class="flex flex-wrap items-center gap-3">
                 <button
                   type="button"
-                  @click="fetchAllData(); showToast('🔄 Data refreshed!')"
-                  class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                  @click="fetchAllData(); showToast('Data synced')"
+                  class="inline-flex items-center gap-2 border border-[#D7D1C5] bg-transparent px-4 py-2 text-xs font-medium tracking-wide text-[#6E6A61] transition-colors hover:border-[#1C1B18] hover:text-[#1C1B18] dark:border-[#2C2B27] dark:text-[#9B968B] dark:hover:border-[#EAE6DD] dark:hover:text-[#EAE6DD]"
                 >
-                  🔄 Refresh
+                  Sync
                 </button>
                 <button
                   type="button"
                   @click="ticketModalOpen = true"
-                  class="inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-700 hover:bg-amber-100 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-300"
+                  class="inline-flex items-center gap-2 border border-[#D7D1C5] bg-[#EFECE4]/60 px-4 py-2 text-xs font-medium tracking-wide text-[#1C1B18] transition-colors hover:border-[#1C1B18] hover:bg-[#EFECE4] dark:border-[#2C2B27] dark:bg-[#1B1B19] dark:text-[#EAE6DD] dark:hover:border-[#EAE6DD]"
                 >
-                  🎫 + New Ticket
+                  + Log Ticket
                 </button>
                 <button
                   type="button"
                   @click="openCreateProblem()"
-                  class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600"
+                  class="inline-flex items-center gap-2 border border-[#1C1B18] bg-[#1C1B18] px-5 py-2 text-xs font-medium tracking-wide text-[#F6F4EF] transition-colors hover:bg-[#33312C] dark:border-[#EAE6DD] dark:bg-[#EAE6DD] dark:text-[#141413] dark:hover:bg-white"
                 >
-                  ➕ Add Problem
+                  + New Problem
                 </button>
               </div>
-            </div>
+            </section>
 
-            <!-- Summary Metric Cards -->
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
-                <span class="text-xs font-medium uppercase text-gray-400">Total Problems</span>
-                <div class="mt-2 flex items-baseline justify-between">
-                  <h3 class="text-3xl font-bold text-gray-900 dark:text-white" x-text="problems.length">0</h3>
-                  <span class="text-xs font-medium text-brand-500">Problems</span>
+            <!-- ==================== 1. ASYMMETRIC EDITORIAL METRICS ==================== -->
+            <section
+              aria-label="Key telemetry"
+              class="grid grid-cols-1 border-y border-[#E2DDD3] lg:grid-cols-12 dark:border-[#2C2B27]"
+            >
+              <!-- Hero Metric: Takes 6 of 12 columns cleanly on the left -->
+              <div class="flex flex-col justify-between py-8 pr-6 lg:col-span-6 lg:py-10 lg:pr-12">
+                <div class="flex items-center justify-between">
+                  <span class="font-mono text-[11px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
+                    01 · Accepted Verdicts
+                  </span>
+                  <span class="inline-flex items-center gap-2 font-mono text-[11px] text-[#2E5A44] dark:text-[#7CA98E]">
+                    <span class="h-1.5 w-1.5 rounded-full bg-[#2E5A44] dark:bg-[#7CA98E]"></span>
+                    Passed Sandbox
+                  </span>
+                </div>
+
+                <div class="mt-8 flex flex-wrap items-baseline gap-6">
+                  <span
+                    class="font-serif text-6xl leading-none font-normal tracking-tight tabular-nums text-[#1C1B18] sm:text-7xl lg:text-[5.25rem] dark:text-[#EAE6DD]"
+                    x-text="acceptedSubmissionsCount"
+                  >0</span>
+                  <div class="space-y-1 pb-1">
+                    <p class="text-sm font-medium text-[#1C1B18] dark:text-[#EAE6DD]">
+                      Verified solutions
+                    </p>
+                    <p
+                      class="font-mono text-xs text-[#6E6A61] dark:text-[#9B968B]"
+                      x-text="acceptanceRateLabel"
+                    ></p>
+                  </div>
                 </div>
               </div>
 
-              <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
-                <span class="text-xs font-medium uppercase text-gray-400">Open IT Tickets</span>
-                <div class="mt-2 flex items-baseline justify-between">
-                  <h3 class="text-3xl font-bold text-amber-500" x-text="openTicketsCount">0</h3>
-                  <span class="text-xs font-medium text-gray-500 dark:text-gray-400" x-text="`Total: ${tickets.length}`"></span>
-                </div>
-              </div>
+              <!-- Right Half: Stacked Asymmetrically (7/5 upper split over 12-col lower strip) -->
+              <div class="flex flex-col border-t border-[#E2DDD3] lg:col-span-6 lg:border-t-0 lg:border-l dark:border-[#2C2B27]">
+                <div class="grid grid-cols-1 border-b border-[#E2DDD3] sm:grid-cols-12 dark:border-[#2C2B27]">
+                  <!-- Open IT Tickets (7 cols) -->
+                  <div class="flex flex-col justify-between py-7 sm:col-span-7 sm:px-8 lg:py-8">
+                    <div class="flex items-center justify-between">
+                      <span class="font-mono text-[11px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
+                        02 · Open Tickets
+                      </span>
+                      <span
+                        class="h-1.5 w-1.5 rounded-full"
+                        :class="openTicketsCount > 0 ? 'bg-[#9A6B2F] dark:bg-[#D4A362]' : 'bg-[#2E5A44] dark:bg-[#7CA98E]'"
+                      ></span>
+                    </div>
+                    <div class="mt-5 flex items-baseline justify-between gap-4">
+                      <span
+                        class="font-serif text-5xl leading-none font-normal tabular-nums text-[#1C1B18] sm:text-6xl dark:text-[#EAE6DD]"
+                        x-text="openTicketsCount"
+                      >0</span>
+                      <span
+                        class="font-mono text-xs text-[#6E6A61] dark:text-[#9B968B]"
+                        x-text="`${tickets.length} logged total`"
+                      ></span>
+                    </div>
+                  </div>
 
-              <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
-                <span class="text-xs font-medium uppercase text-gray-400">Total Submissions</span>
-                <div class="mt-2 flex items-baseline justify-between">
-                  <h3 class="text-3xl font-bold text-gray-900 dark:text-white" x-text="submissions.length">0</h3>
-                  <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Last 50</span>
+                  <!-- Active Problems (5 cols) -->
+                  <div class="flex flex-col justify-between border-t border-[#E2DDD3] py-7 sm:col-span-5 sm:border-t-0 sm:border-l sm:pl-8 lg:py-8 dark:border-[#2C2B27]">
+                    <span class="font-mono text-[11px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
+                      03 · Problems
+                    </span>
+                    <div class="mt-5 flex items-baseline justify-between gap-3">
+                      <span
+                        class="font-serif text-5xl leading-none font-normal tabular-nums text-[#1C1B18] sm:text-6xl dark:text-[#EAE6DD]"
+                        x-text="problems.length"
+                      >0</span>
+                      <span class="font-mono text-xs text-[#6E6A61] dark:text-[#9B968B]">
+                        Active
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
-                <span class="text-xs font-medium uppercase text-gray-400">Accepted Submissions</span>
-                <div class="mt-2 flex items-baseline justify-between">
-                  <h3 class="text-3xl font-bold text-green-600 dark:text-green-400" x-text="acceptedSubmissionsCount">0</h3>
-                  <span class="text-xs font-medium text-green-600 dark:text-green-400">Passed</span>
+                <!-- Lower Strip: Total Submissions -->
+                <div class="flex flex-wrap items-center justify-between gap-4 py-6 sm:px-8">
+                  <div class="flex items-baseline gap-4">
+                    <span
+                      class="font-serif text-4xl leading-none font-normal tabular-nums text-[#1C1B18] dark:text-[#EAE6DD]"
+                      x-text="submissions.length"
+                    >0</span>
+                    <div>
+                      <span class="block text-xs font-medium text-[#1C1B18] dark:text-[#EAE6DD]">
+                        Total Sandbox Runs
+                      </span>
+                      <span class="block font-mono text-[11px] text-[#6E6A61] dark:text-[#9B968B]">
+                        Showing up to 50 latest submissions
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    @click="activeTab = 'submissions'"
+                    x-show="activeTab !== 'submissions'"
+                    class="border-b border-[#1C1B18]/40 pb-0.5 font-mono text-[11px] tracking-wider text-[#1C1B18] uppercase transition-colors hover:border-[#1C1B18] dark:border-[#EAE6DD]/40 dark:text-[#EAE6DD] dark:hover:border-[#EAE6DD]"
+                  >
+                    Inspect Queue →
+                  </button>
                 </div>
               </div>
-            </div>
+            </section>
 
             <!-- ==================== SECTION 1: PROBLEMS ==================== -->
-            <div
-              x-show="activeTab === 'all' || activeTab === 'problems'"
-              class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3"
-            >
-              <div class="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
+            <section x-show="activeTab === 'all' || activeTab === 'problems'" class="space-y-6">
+              <div class="flex flex-col gap-4 border-b border-[#E2DDD3] pb-5 sm:flex-row sm:items-end sm:justify-between dark:border-[#2C2B27]">
                 <div>
-                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    📚 Problems &amp; Test Cases
+                  <span class="font-mono text-[11px] tracking-[0.16em] text-[#9A9488] uppercase dark:text-[#6E6A61]">
+                    Section 01
+                  </span>
+                  <h2 class="mt-1 font-serif text-2xl font-normal tracking-tight text-[#1C1B18] sm:text-3xl dark:text-[#EAE6DD]">
+                    Problem Archive <span class="italic text-[#6E6A61] dark:text-[#9B968B]">&amp; Test Suites</span>
                   </h2>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    Add, edit, or delete coding problems and manage their input/output test cases.
-                  </p>
                 </div>
-                <div class="flex items-center gap-2">
+
+                <div class="flex items-center gap-5">
                   <input
                     type="text"
                     x-model="searchQuery"
-                    placeholder="Search title, difficulty, #ID..."
-                    class="h-10 rounded-xl border border-gray-200 bg-transparent px-3.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-400 focus:outline-hidden dark:border-gray-700 dark:text-white"
+                    placeholder="Search title or #ID..."
+                    class="w-48 border-b border-[#D7D1C5] bg-transparent py-1.5 text-xs text-[#1C1B18] placeholder:text-[#9A9488] focus:border-[#1C1B18] focus:outline-none sm:w-56 dark:border-[#2C2B27] dark:text-[#EAE6DD] dark:placeholder:text-[#6E6A61] dark:focus:border-[#EAE6DD]"
                   />
                   <button
                     type="button"
                     @click="openCreateProblem()"
-                    class="rounded-xl bg-brand-500 px-3.5 py-2 text-xs font-medium text-white hover:bg-brand-600"
+                    class="font-mono text-xs tracking-wide text-[#1C1B18] underline decoration-[#1C1B18]/35 underline-offset-4 transition-colors hover:decoration-[#1C1B18] dark:text-[#EAE6DD] dark:decoration-[#EAE6DD]/35 dark:hover:decoration-[#EAE6DD]"
                   >
                     + Add Problem
                   </button>
                 </div>
               </div>
 
-              <div class="overflow-x-auto p-4 sm:p-6">
-                <table class="min-w-full">
-                  <thead class="border-b border-gray-100 dark:border-white/5">
-                    <tr>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">ID</th>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Title</th>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Description</th>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Difficulty</th>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Limits</th>
-                      <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Actions</th>
+              <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                  <thead>
+                    <tr class="border-b border-[#E2DDD3] dark:border-[#2C2B27]">
+                      <th class="py-3.5 pr-4 pl-4 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">No.</th>
+                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Title</th>
+                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Prompt Summary</th>
+                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Difficulty</th>
+                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Limits</th>
+                      <th class="py-3.5 pr-3 pl-4 text-right font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Manage</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-gray-100 dark:divide-white/5">
+                  <tbody class="divide-y divide-[#E2DDD3]/75 dark:divide-[#2C2B27]/80">
                     <template x-if="filteredProblems.length === 0">
                       <tr>
-                        <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-400">
-                          No problems found. Click <b>"+ Add Problem"</b> to create one!
+                        <td colspan="6" class="px-4 py-14 text-center text-sm text-[#6E6A61] dark:text-[#9B968B]">
+                          No coding problems match your filter. Select <span class="underline cursor-pointer" @click="openCreateProblem()">New Problem</span> to draft one.
                         </td>
                       </tr>
                     </template>
                     <template x-for="p in filteredProblems" :key="p.id">
-                      <tr class="hover:bg-gray-50/60 dark:hover:bg-white/2">
-                        <td class="px-4 py-4 text-sm font-semibold text-gray-900 dark:text-white" x-text="`#${p.id}`"></td>
-                        <td class="px-4 py-4 text-sm font-medium text-gray-900 dark:text-white" x-text="p.title"></td>
-                        <td class="max-w-md px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
+                      <tr class="group transition-colors duration-150 hover:bg-[#EFECE4]/60 dark:hover:bg-[#1B1B19]">
+                        <td class="relative py-5 pr-4 pl-4 font-mono text-xs text-[#6E6A61] tabular-nums dark:text-[#9B968B]">
+                          <span
+                            class="absolute top-3.5 bottom-3.5 left-0 w-[2px] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                            :class="rowAccentClass(p.difficulty || 'Easy')"
+                          ></span>
+                          <span x-text="`#${String(p.id).padStart(2, '0')}`"></span>
+                        </td>
+                        <td class="px-4 py-5 text-sm font-medium text-[#1C1B18] dark:text-[#EAE6DD]" x-text="p.title"></td>
+                        <td class="max-w-md px-4 py-5 text-sm leading-relaxed text-[#6E6A61] dark:text-[#9B968B]">
                           <p class="line-clamp-2" x-text="p.description"></p>
                         </td>
-                        <td class="px-4 py-4 text-sm">
-                          <span
-                            class="inline-flex rounded-lg px-2.5 py-0.5 text-xs font-medium"
-                            :class="{
-                              'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400': (p.difficulty || '').toLowerCase() === 'easy',
-                              'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400': (p.difficulty || '').toLowerCase() === 'medium',
-                              'bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-400': (p.difficulty || '').toLowerCase() === 'hard',
-                              'bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-gray-300': !['easy','medium','hard'].includes((p.difficulty || '').toLowerCase())
-                            }"
-                            x-text="p.difficulty || 'Easy'"
-                          ></span>
+                        <td class="px-4 py-5 text-sm">
+                          <span class="inline-flex items-center gap-2 text-xs font-medium text-[#1C1B18] dark:text-[#EAE6DD]">
+                            <span
+                              class="h-1.5 w-1.5 rounded-full"
+                              :class="statusDotClass(p.difficulty || 'Easy')"
+                            ></span>
+                            <span x-text="p.difficulty || 'Easy'"></span>
+                          </span>
                         </td>
-                        <td class="px-4 py-4 text-xs text-gray-500 dark:text-gray-400">
-                          <span x-text="`${p.time_limit || 1.0}s / ${p.memory_limit || 256}MB`"></span>
+                        <td class="px-4 py-5 font-mono text-xs text-[#6E6A61] tabular-nums dark:text-[#9B968B]">
+                          <span x-text="`${p.time_limit || 1.0}s · ${p.memory_limit || 256}MB`"></span>
                         </td>
-                        <td class="px-4 py-4 text-right text-sm whitespace-nowrap">
-                          <div class="inline-flex items-center gap-2">
+                        <td class="py-5 pr-3 pl-4 text-right text-xs whitespace-nowrap">
+                          <div class="inline-flex items-center gap-4 opacity-55 transition-opacity duration-200 group-hover:opacity-100 max-sm:opacity-100">
                             <button
                               type="button"
                               @click="openTestCasesModal(p)"
-                              class="rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-600 hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-brand-300"
+                              class="font-medium text-[#1C1B18] underline decoration-[#1C1B18]/30 underline-offset-4 hover:decoration-[#1C1B18] dark:text-[#EAE6DD] dark:decoration-[#EAE6DD]/30 dark:hover:decoration-[#EAE6DD]"
                             >
-                              🧪 Test Cases
+                              Test Cases
                             </button>
                             <button
                               type="button"
                               @click="openEditProblem(p)"
-                              class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                              class="font-medium text-[#6E6A61] hover:text-[#1C1B18] dark:text-[#9B968B] dark:hover:text-[#EAE6DD]"
                             >
-                              ✏️ Edit
+                              Edit
                             </button>
                             <button
                               type="button"
                               @click="deleteProblem(p.id)"
-                              class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-400"
-                            >
-                              🗑️ Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    </template>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- ==================== SECTION 2: IT TICKETS ==================== -->
-            <div
-              x-show="activeTab === 'all' || activeTab === 'tickets'"
-              class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3"
-            >
-              <div class="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
-                <div>
-                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    🎫 IT Tickets (Discord Helpdesk)
-                  </h2>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    Tickets sent from Discord via <code class="rounded bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800">*ticket &lt;issue&gt;</code> appear here.
-                  </p>
-                </div>
-                <div class="flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    @click="ticketFilter = 'ALL'"
-                    class="rounded-lg px-3 py-1.5 text-xs font-medium"
-                    :class="ticketFilter === 'ALL' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
-                  >
-                    All (<span x-text="tickets.length"></span>)
-                  </button>
-                  <button
-                    type="button"
-                    @click="ticketFilter = 'Open'"
-                    class="rounded-lg px-3 py-1.5 text-xs font-medium"
-                    :class="ticketFilter === 'Open' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
-                  >
-                    Open
-                  </button>
-                  <button
-                    type="button"
-                    @click="ticketFilter = 'In-Progress'"
-                    class="rounded-lg px-3 py-1.5 text-xs font-medium"
-                    :class="ticketFilter === 'In-Progress' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
-                  >
-                    In-Progress
-                  </button>
-                  <button
-                    type="button"
-                    @click="ticketFilter = 'Resolved'"
-                    class="rounded-lg px-3 py-1.5 text-xs font-medium"
-                    :class="ticketFilter === 'Resolved' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
-                  >
-                    Resolved
-                  </button>
-                </div>
-              </div>
-
-              <div class="overflow-x-auto p-4 sm:p-6">
-                <table class="min-w-full">
-                  <thead class="border-b border-gray-100 dark:border-white/5">
-                    <tr>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Ticket ID</th>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Discord User ID</th>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Issue Description</th>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Status</th>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Created At</th>
-                      <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-gray-100 dark:divide-white/5">
-                    <template x-if="filteredTickets.length === 0">
-                      <tr>
-                        <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-400">
-                          No IT tickets found.
-                        </td>
-                      </tr>
-                    </template>
-                    <template x-for="t in filteredTickets" :key="t.id">
-                      <tr class="hover:bg-gray-50/60 dark:hover:bg-white/2">
-                        <td class="px-4 py-4 text-sm font-semibold text-gray-900 dark:text-white" x-text="`TICKET-#${t.id}`"></td>
-                        <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300" x-text="t.user_discord_id"></td>
-                        <td class="max-w-md px-4 py-4 text-sm text-gray-800 dark:text-gray-200" x-text="t.issue_description"></td>
-                        <td class="px-4 py-4 text-sm">
-                          <span
-                            class="inline-flex rounded-lg px-2.5 py-0.5 text-xs font-medium"
-                            :class="{
-                              'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400': t.status === 'Open',
-                              'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400': t.status === 'In-Progress',
-                              'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400': t.status === 'Resolved'
-                            }"
-                            x-text="t.status"
-                          ></span>
-                        </td>
-                        <td class="px-4 py-4 text-xs text-gray-500 dark:text-gray-400" x-text="formatDate(t.created_at)"></td>
-                        <td class="px-4 py-4 text-right text-sm whitespace-nowrap">
-                          <div class="inline-flex items-center gap-1.5">
-                            <button
-                              type="button"
-                              x-show="t.status !== 'In-Progress'"
-                              @click="updateTicketStatus(t.id, 'In-Progress')"
-                              class="rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100 dark:border-blue-500/30 dark:bg-blue-500/15 dark:text-blue-300"
-                            >
-                              In-Progress
-                            </button>
-                            <button
-                              type="button"
-                              x-show="t.status !== 'Resolved'"
-                              @click="updateTicketStatus(t.id, 'Resolved')"
-                              class="rounded-lg border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-medium text-green-600 hover:bg-green-100 dark:border-green-500/30 dark:bg-green-500/15 dark:text-green-300"
-                            >
-                              ✔ Resolve
-                            </button>
-                            <button
-                              type="button"
-                              x-show="t.status === 'Resolved'"
-                              @click="updateTicketStatus(t.id, 'Open')"
-                              class="rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                            >
-                              Reopen
-                            </button>
-                            <button
-                              type="button"
-                              @click="removeTicket(t.id)"
-                              class="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-400"
+                              class="font-medium text-[#8B2635]/80 hover:text-[#8B2635] dark:text-[#D47A86]/80 dark:hover:text-[#D47A86]"
                             >
                               Delete
                             </button>
@@ -805,70 +863,207 @@
                   </tbody>
                 </table>
               </div>
-            </div>
+            </section>
+
+            <!-- ==================== SECTION 2: IT TICKETS ==================== -->
+            <section x-show="activeTab === 'all' || activeTab === 'tickets'" class="space-y-6">
+              <div class="flex flex-col gap-4 border-b border-[#E2DDD3] pb-5 sm:flex-row sm:items-end sm:justify-between dark:border-[#2C2B27]">
+                <div>
+                  <span class="font-mono text-[11px] tracking-[0.16em] text-[#9A9488] uppercase dark:text-[#6E6A61]">
+                    Section 02
+                  </span>
+                  <h2 class="mt-1 font-serif text-2xl font-normal tracking-tight text-[#1C1B18] sm:text-3xl dark:text-[#EAE6DD]">
+                    IT Support <span class="italic text-[#6E6A61] dark:text-[#9B968B]">Dispatch</span>
+                  </h2>
+                  <p class="mt-1 text-xs text-[#6E6A61] dark:text-[#9B968B]">
+                    Submitted directly from Discord via <code class="font-mono text-[#1C1B18] dark:text-[#EAE6DD]">*ticket &lt;issue&gt;</code>
+                  </p>
+                </div>
+
+                <!-- Minimalist editorial underline filter tabs -->
+                <div class="flex flex-wrap items-center gap-5">
+                  <template
+                    x-for="tab in [
+                      { key: 'ALL', label: `All (${tickets.length})` },
+                      { key: 'Open', label: 'Open' },
+                      { key: 'In-Progress', label: 'In-Progress' },
+                      { key: 'Resolved', label: 'Resolved' }
+                    ]"
+                    :key="tab.key"
+                  >
+                    <button
+                      type="button"
+                      @click="ticketFilter = tab.key"
+                      class="border-b-2 pb-1 text-xs font-medium transition-colors"
+                      :class="ticketFilter === tab.key
+                        ? 'border-[#1C1B18] text-[#1C1B18] dark:border-[#EAE6DD] dark:text-[#EAE6DD]'
+                        : 'border-transparent text-[#6E6A61] hover:text-[#1C1B18] dark:text-[#9B968B] dark:hover:text-[#EAE6DD]'"
+                      x-text="tab.label"
+                    ></button>
+                  </template>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                  <thead>
+                    <tr class="border-b border-[#E2DDD3] dark:border-[#2C2B27]">
+                      <th class="py-3.5 pr-4 pl-4 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Ticket</th>
+                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Requester</th>
+                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Description</th>
+                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Status</th>
+                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Logged</th>
+                      <th class="py-3.5 pr-3 pl-4 text-right font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Resolution</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-[#E2DDD3]/75 dark:divide-[#2C2B27]/80">
+                    <template x-if="filteredTickets.length === 0">
+                      <tr>
+                        <td colspan="6" class="px-4 py-14 text-center text-sm text-[#6E6A61] dark:text-[#9B968B]">
+                          No support tickets in this view.
+                        </td>
+                      </tr>
+                    </template>
+                    <template x-for="t in filteredTickets" :key="t.id">
+                      <tr class="group transition-colors duration-150 hover:bg-[#EFECE4]/60 dark:hover:bg-[#1B1B19]">
+                        <td class="relative py-5 pr-4 pl-4 font-mono text-xs text-[#6E6A61] tabular-nums dark:text-[#9B968B]">
+                          <span
+                            class="absolute top-3.5 bottom-3.5 left-0 w-[2px] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                            :class="rowAccentClass(t.status)"
+                          ></span>
+                          <span x-text="`TCK-${String(t.id).padStart(2, '0')}`"></span>
+                        </td>
+                        <td class="px-4 py-5 font-mono text-xs text-[#6E6A61] dark:text-[#9B968B]" x-text="t.user_discord_id"></td>
+                        <td class="max-w-md px-4 py-5 text-sm leading-relaxed text-[#1C1B18] dark:text-[#EAE6DD]" x-text="t.issue_description"></td>
+                        <td class="px-4 py-5 text-sm">
+                          <span class="inline-flex items-center gap-2 text-xs font-medium text-[#1C1B18] dark:text-[#EAE6DD]">
+                            <span
+                              class="h-1.5 w-1.5 rounded-full"
+                              :class="statusDotClass(t.status)"
+                            ></span>
+                            <span x-text="t.status"></span>
+                          </span>
+                        </td>
+                        <td
+                          class="px-4 py-5 font-mono text-xs text-[#6E6A61] dark:text-[#9B968B]"
+                          :title="formatExactDate(t.created_at)"
+                          x-text="formatRelativeTime(t.created_at)"
+                        ></td>
+                        <td class="py-5 pr-3 pl-4 text-right text-xs whitespace-nowrap">
+                          <div class="inline-flex items-center gap-4 opacity-55 transition-opacity duration-200 group-hover:opacity-100 max-sm:opacity-100">
+                            <button
+                              type="button"
+                              x-show="t.status !== 'In-Progress'"
+                              @click="updateTicketStatus(t.id, 'In-Progress')"
+                              class="font-medium text-[#3B5B75] hover:underline dark:text-[#84A8C4]"
+                            >
+                              In-Progress
+                            </button>
+                            <button
+                              type="button"
+                              x-show="t.status !== 'Resolved'"
+                              @click="updateTicketStatus(t.id, 'Resolved')"
+                              class="font-medium text-[#2E5A44] hover:underline dark:text-[#7CA98E]"
+                            >
+                              Resolve
+                            </button>
+                            <button
+                              type="button"
+                              x-show="t.status === 'Resolved'"
+                              @click="updateTicketStatus(t.id, 'Open')"
+                              class="font-medium text-[#6E6A61] hover:text-[#1C1B18] dark:text-[#9B968B] dark:hover:text-[#EAE6DD]"
+                            >
+                              Reopen
+                            </button>
+                            <button
+                              type="button"
+                              @click="removeTicket(t.id)"
+                              class="font-medium text-[#8B2635]/80 hover:text-[#8B2635] dark:text-[#D47A86]/80 dark:hover:text-[#D47A86]"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </section>
 
             <!-- ==================== SECTION 3: SUBMISSIONS ==================== -->
-            <div
-              x-show="activeTab === 'all' || activeTab === 'submissions'"
-              class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3"
-            >
-              <div class="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
+            <section x-show="activeTab === 'all' || activeTab === 'submissions'" class="space-y-6">
+              <div class="flex flex-col gap-4 border-b border-[#E2DDD3] pb-5 sm:flex-row sm:items-end sm:justify-between dark:border-[#2C2B27]">
                 <div>
-                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    💻 Recent Submissions
+                  <span class="font-mono text-[11px] tracking-[0.16em] text-[#9A9488] uppercase dark:text-[#6E6A61]">
+                    Section 03
+                  </span>
+                  <h2 class="mt-1 font-serif text-2xl font-normal tracking-tight text-[#1C1B18] sm:text-3xl dark:text-[#EAE6DD]">
+                    Submission <span class="italic text-[#6E6A61] dark:text-[#9B968B]">Journal</span>
                   </h2>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    View code submissions judged by the Docker Sandbox.
+                  <p class="mt-1 text-xs text-[#6E6A61] dark:text-[#9B968B]">
+                    Hover any row to inspect the submitted Python source and sandbox diagnostics.
                   </p>
                 </div>
               </div>
 
-              <div class="overflow-x-auto p-4 sm:p-6">
-                <table class="min-w-full">
-                  <thead class="border-b border-gray-100 dark:border-white/5">
-                    <tr>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">ID</th>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Discord User</th>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Problem</th>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Status</th>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Runtime</th>
-                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Submitted At</th>
-                      <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Code</th>
+              <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                  <thead>
+                    <tr class="border-b border-[#E2DDD3] dark:border-[#2C2B27]">
+                      <th class="py-3.5 pr-4 pl-4 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Run</th>
+                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Discord User</th>
+                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Problem</th>
+                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Verdict</th>
+                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Runtime</th>
+                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Submitted At</th>
+                      <th class="py-3.5 pr-3 pl-4 text-right font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Source</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-gray-100 dark:divide-white/5">
-                    <template x-if="submissions.length === 0">
+                  <tbody class="divide-y divide-[#E2DDD3]/75 dark:divide-[#2C2B27]/80">
+                    <template x-if="filteredSubmissions.length === 0">
                       <tr>
-                        <td colspan="7" class="px-4 py-8 text-center text-sm text-gray-400">
-                          No submissions yet.
+                        <td colspan="7" class="px-4 py-14 text-center text-sm text-[#6E6A61] dark:text-[#9B968B]">
+                          No code submissions recorded yet.
                         </td>
                       </tr>
                     </template>
-                    <template x-for="s in submissions" :key="s.id">
-                      <tr class="hover:bg-gray-50/60 dark:hover:bg-white/2">
-                        <td class="px-4 py-3.5 text-sm font-semibold text-gray-900 dark:text-white" x-text="`#${s.id}`"></td>
-                        <td class="px-4 py-3.5 text-sm text-gray-600 dark:text-gray-300" x-text="s.user_discord_id"></td>
-                        <td class="px-4 py-3.5 text-sm font-medium text-brand-500" x-text="`Problem #${s.problem_id}`"></td>
-                        <td class="px-4 py-3.5 text-sm">
+                    <template x-for="s in filteredSubmissions" :key="s.id">
+                      <tr class="group transition-colors duration-150 hover:bg-[#EFECE4]/60 dark:hover:bg-[#1B1B19]">
+                        <td class="relative py-5 pr-4 pl-4 font-mono text-xs text-[#6E6A61] tabular-nums dark:text-[#9B968B]">
                           <span
-                            class="inline-flex rounded-lg px-2.5 py-0.5 text-xs font-medium"
-                            :class="{
-                              'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400': s.status === 'Accepted' || s.status === 'ACCEPTED',
-                              'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400': s.status === 'Pending' || s.status === 'Judging',
-                              'bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-400': !['Accepted','ACCEPTED','Pending','Judging'].includes(s.status)
-                            }"
-                            x-text="s.status"
+                            class="absolute top-3.5 bottom-3.5 left-0 w-[2px] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                            :class="rowAccentClass(s.status)"
                           ></span>
+                          <span x-text="`#${String(s.id).padStart(2, '0')}`"></span>
                         </td>
-                        <td class="px-4 py-3.5 text-xs text-gray-500 dark:text-gray-400" x-text="s.runtime != null ? `${s.runtime}s` : '-'"></td>
-                        <td class="px-4 py-3.5 text-xs text-gray-500 dark:text-gray-400" x-text="formatDate(s.created_at)"></td>
-                        <td class="px-4 py-3.5 text-right text-sm">
+                        <td class="px-4 py-5 font-mono text-xs text-[#6E6A61] dark:text-[#9B968B]" x-text="s.user_discord_id"></td>
+                        <td class="px-4 py-5 text-sm font-medium text-[#1C1B18] dark:text-[#EAE6DD]" x-text="`Problem #${s.problem_id}`"></td>
+                        <td class="px-4 py-5 text-sm">
+                          <span class="inline-flex items-center gap-2 text-xs font-medium text-[#1C1B18] dark:text-[#EAE6DD]">
+                            <span
+                              class="h-1.5 w-1.5 rounded-full"
+                              :class="statusDotClass(s.status)"
+                            ></span>
+                            <span x-text="s.status"></span>
+                          </span>
+                        </td>
+                        <td
+                          class="px-4 py-5 font-mono text-xs text-[#6E6A61] tabular-nums dark:text-[#9B968B]"
+                          x-text="s.runtime != null ? `${s.runtime}s` : '—'"
+                        ></td>
+                        <td
+                          class="px-4 py-5 text-xs text-[#6E6A61] dark:text-[#9B968B]"
+                          :title="formatExactDate(s.created_at)"
+                          x-text="formatRelativeTime(s.created_at)"
+                        ></td>
+                        <td class="py-5 pr-3 pl-4 text-right whitespace-nowrap">
                           <button
                             type="button"
                             @click="openSubmissionDetail(s)"
-                            class="rounded-lg border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                            class="pointer-events-none inline-flex translate-x-1 items-center gap-1.5 border border-[#1C1B18]/25 bg-[#FBF9F5] px-3 py-1 font-mono text-[11px] font-medium text-[#1C1B18] opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-x-0 group-hover:opacity-100 hover:border-[#1C1B18] focus:pointer-events-auto focus:opacity-100 max-sm:pointer-events-auto max-sm:translate-x-0 max-sm:opacity-100 dark:border-[#EAE6DD]/25 dark:bg-[#1B1B19] dark:text-[#EAE6DD] dark:hover:border-[#EAE6DD]"
                           >
-                            👁️ View Code
+                            View Code →
                           </button>
                         </td>
                       </tr>
@@ -876,7 +1071,7 @@
                   </tbody>
                 </table>
               </div>
-            </div>
+            </section>
           </div>
         </main>
         <!-- ===== Main Content End ===== -->
@@ -889,34 +1084,42 @@
     <div
       x-cloak
       x-show="problemModalOpen"
-      class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-xs"
+      class="fixed inset-0 z-99999 flex items-center justify-center bg-[#1C1B18]/45 p-4 backdrop-blur-xs"
     >
       <div
         @click.outside="problemModalOpen = false"
-        class="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xl dark:border-gray-800 dark:bg-gray-900"
+        class="w-full max-w-lg border border-[#E2DDD3] bg-[#FBF9F5] p-7 shadow-xl dark:border-[#2C2B27] dark:bg-[#1B1B19]"
       >
+        <p class="font-mono text-[10px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
+          Problem Specification
+        </p>
         <h3
-          class="text-lg font-bold text-gray-900 dark:text-white"
-          x-text="isEditingProblem ? `Edit Problem #${problemForm.id}` : 'Add New Problem'"
+          class="mt-1 font-serif text-2xl font-normal text-[#1C1B18] dark:text-[#EAE6DD]"
+          x-text="isEditingProblem ? `Edit Problem #${problemForm.id}` : 'Compose New Problem'"
         ></h3>
-        <form @submit.prevent="saveProblem()" class="mt-4 space-y-4">
+
+        <form @submit.prevent="saveProblem()" class="mt-6 space-y-5">
           <div>
-            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Title *</label>
+            <label class="mb-1.5 block font-mono text-[11px] tracking-wider text-[#6E6A61] uppercase dark:text-[#9B968B]">
+              Title *
+            </label>
             <input
               type="text"
               required
               x-model="problemForm.title"
-              placeholder="e.g. Sum of Two Numbers"
-              class="w-full rounded-xl border border-gray-300 bg-transparent px-3.5 py-2.5 text-sm text-gray-900 dark:border-gray-700 dark:text-white"
+              placeholder="e.g. Two Sum"
+              class="w-full border border-[#D7D1C5] bg-transparent px-3.5 py-2.5 text-sm text-[#1C1B18] focus:border-[#1C1B18] focus:outline-none dark:border-[#2C2B27] dark:text-[#EAE6DD] dark:focus:border-[#EAE6DD]"
             />
           </div>
 
-          <div class="grid grid-cols-3 gap-3">
+          <div class="grid grid-cols-3 gap-4">
             <div>
-              <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Difficulty</label>
+              <label class="mb-1.5 block font-mono text-[11px] tracking-wider text-[#6E6A61] uppercase dark:text-[#9B968B]">
+                Difficulty
+              </label>
               <select
                 x-model="problemForm.difficulty"
-                class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                class="w-full border border-[#D7D1C5] bg-[#FBF9F5] px-3 py-2.5 text-sm text-[#1C1B18] focus:border-[#1C1B18] focus:outline-none dark:border-[#2C2B27] dark:bg-[#141413] dark:text-[#EAE6DD]"
               >
                 <option value="Easy">Easy</option>
                 <option value="Medium">Medium</option>
@@ -924,48 +1127,54 @@
               </select>
             </div>
             <div>
-              <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Time Limit (sec)</label>
+              <label class="mb-1.5 block font-mono text-[11px] tracking-wider text-[#6E6A61] uppercase dark:text-[#9B968B]">
+                Time (sec)
+              </label>
               <input
                 type="number"
                 step="0.1"
                 x-model="problemForm.time_limit"
-                class="w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2.5 text-sm text-gray-900 dark:border-gray-700 dark:text-white"
+                class="w-full border border-[#D7D1C5] bg-transparent px-3.5 py-2.5 font-mono text-sm text-[#1C1B18] focus:border-[#1C1B18] focus:outline-none dark:border-[#2C2B27] dark:text-[#EAE6DD]"
               />
             </div>
             <div>
-              <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Memory (MB)</label>
+              <label class="mb-1.5 block font-mono text-[11px] tracking-wider text-[#6E6A61] uppercase dark:text-[#9B968B]">
+                Memory (MB)
+              </label>
               <input
                 type="number"
                 x-model="problemForm.memory_limit"
-                class="w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2.5 text-sm text-gray-900 dark:border-gray-700 dark:text-white"
+                class="w-full border border-[#D7D1C5] bg-transparent px-3.5 py-2.5 font-mono text-sm text-[#1C1B18] focus:border-[#1C1B18] focus:outline-none dark:border-[#2C2B27] dark:text-[#EAE6DD]"
               />
             </div>
           </div>
 
           <div>
-            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Description *</label>
+            <label class="mb-1.5 block font-mono text-[11px] tracking-wider text-[#6E6A61] uppercase dark:text-[#9B968B]">
+              Statement *
+            </label>
             <textarea
               rows="5"
               required
               x-model="problemForm.description"
-              placeholder="Write problem description and examples..."
-              class="w-full rounded-xl border border-gray-300 bg-transparent p-3.5 text-sm text-gray-900 dark:border-gray-700 dark:text-white"
+              placeholder="Write problem description, constraints, and sample I/O..."
+              class="w-full border border-[#D7D1C5] bg-transparent p-3.5 text-sm leading-relaxed text-[#1C1B18] focus:border-[#1C1B18] focus:outline-none dark:border-[#2C2B27] dark:text-[#EAE6DD] dark:focus:border-[#EAE6DD]"
             ></textarea>
           </div>
 
-          <div class="flex justify-end gap-2 pt-2">
+          <div class="flex justify-end gap-3 border-t border-[#E2DDD3] pt-4 dark:border-[#2C2B27]">
             <button
               type="button"
               @click="problemModalOpen = false"
-              class="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300"
+              class="border border-[#D7D1C5] px-4 py-2 text-xs font-medium text-[#6E6A61] hover:border-[#1C1B18] hover:text-[#1C1B18] dark:border-[#2C2B27] dark:text-[#9B968B] dark:hover:text-[#EAE6DD]"
             >
               Cancel
             </button>
             <button
               type="submit"
-              class="rounded-xl bg-brand-500 px-5 py-2 text-sm font-medium text-white hover:bg-brand-600"
+              class="border border-[#1C1B18] bg-[#1C1B18] px-5 py-2 text-xs font-medium text-[#F6F4EF] hover:bg-[#33312C] dark:border-[#EAE6DD] dark:bg-[#EAE6DD] dark:text-[#141413] dark:hover:bg-white"
             >
-              💾 Save Problem
+              Save Problem
             </button>
           </div>
         </form>
@@ -976,91 +1185,98 @@
     <div
       x-cloak
       x-show="testCaseModalOpen"
-      class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-xs"
+      class="fixed inset-0 z-99999 flex items-center justify-center bg-[#1C1B18]/45 p-4 backdrop-blur-xs"
     >
       <div
         @click.outside="testCaseModalOpen = false"
-        class="w-full max-w-2xl rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xl dark:border-gray-800 dark:bg-gray-900"
+        class="w-full max-w-2xl border border-[#E2DDD3] bg-[#FBF9F5] p-7 shadow-xl dark:border-[#2C2B27] dark:bg-[#1B1B19]"
       >
-        <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
-          <h3
-            class="text-lg font-bold text-gray-900 dark:text-white"
-            x-text="selectedProblem ? `🧪 Test Cases — Problem #${selectedProblem.id}: ${selectedProblem.title}` : 'Test Cases'"
-          ></h3>
+        <div class="flex items-start justify-between border-b border-[#E2DDD3] pb-4 dark:border-[#2C2B27]">
+          <div>
+            <p class="font-mono text-[10px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
+              Sandbox Verification Suite
+            </p>
+            <h3
+              class="mt-1 font-serif text-2xl font-normal text-[#1C1B18] dark:text-[#EAE6DD]"
+              x-text="selectedProblem ? `#${selectedProblem.id} — ${selectedProblem.title}` : 'Test Cases'"
+            ></h3>
+          </div>
           <button
             type="button"
             @click="testCaseModalOpen = false"
-            class="text-gray-400 hover:text-gray-600 dark:hover:text-white"
+            class="font-mono text-xs text-[#6E6A61] hover:text-[#1C1B18] dark:text-[#9B968B] dark:hover:text-[#EAE6DD]"
           >
-            ✕
+            ESC
           </button>
         </div>
 
         <!-- Existing Test Cases -->
-        <div class="mt-4 max-h-60 overflow-y-auto space-y-2">
+        <div class="mt-5 max-h-60 space-y-3 overflow-y-auto">
           <template x-if="testCases.length === 0">
-            <p class="py-4 text-center text-sm text-amber-600 dark:text-amber-400">
-              ⚠️ No test cases yet! Add at least 1 test case below so the Sandbox can judge submissions.
+            <p class="border border-dashed border-[#D7D1C5] py-6 text-center text-xs text-[#9A6B2F] dark:border-[#2C2B27] dark:text-[#D4A362]">
+              No test cases configured yet. Add at least one case below so the Sandbox can judge runs.
             </p>
           </template>
           <template x-for="tc in testCases" :key="tc.id">
-            <div class="flex items-start justify-between gap-4 rounded-xl border border-gray-200 p-3 dark:border-gray-800">
+            <div class="flex items-start justify-between gap-4 border border-[#E2DDD3] bg-[#F6F4EF]/70 p-3.5 dark:border-[#2C2B27] dark:bg-[#141413]">
               <div class="grid flex-1 grid-cols-2 gap-3 text-xs">
                 <div>
-                  <span class="font-semibold text-gray-500 dark:text-gray-400">Input (stdin):</span>
-                  <pre class="mt-1 rounded bg-gray-100 p-2 font-mono text-gray-800 dark:bg-gray-800 dark:text-gray-200" x-text="tc.input_data || '(empty)'"></pre>
+                  <span class="font-mono text-[10px] tracking-wider text-[#6E6A61] uppercase dark:text-[#9B968B]">stdin</span>
+                  <pre class="mt-1.5 bg-[#EFECE4] p-2.5 font-mono text-[#1C1B18] dark:bg-[#1B1B19] dark:text-[#EAE6DD]" x-text="tc.input_data || '(empty)'"></pre>
                 </div>
                 <div>
-                  <span class="font-semibold text-gray-500 dark:text-gray-400">Expected Output (stdout):</span>
-                  <pre class="mt-1 rounded bg-gray-100 p-2 font-mono text-gray-800 dark:bg-gray-800 dark:text-gray-200" x-text="tc.expected_output"></pre>
+                  <span class="font-mono text-[10px] tracking-wider text-[#6E6A61] uppercase dark:text-[#9B968B]">expected stdout</span>
+                  <pre class="mt-1.5 bg-[#EFECE4] p-2.5 font-mono text-[#1C1B18] dark:bg-[#1B1B19] dark:text-[#EAE6DD]" x-text="tc.expected_output"></pre>
                 </div>
               </div>
               <button
                 type="button"
                 @click="removeTestCase(tc.id)"
-                class="rounded-lg bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-100 dark:bg-red-500/15 dark:text-red-400"
+                class="font-mono text-[11px] text-[#8B2635] hover:underline dark:text-[#D47A86]"
               >
-                Delete
+                Remove
               </button>
             </div>
           </template>
         </div>
 
         <!-- Add New Test Case Form -->
-        <form @submit.prevent="addTestCase()" class="mt-4 border-t border-gray-100 pt-4 space-y-3 dark:border-gray-800">
-          <h4 class="text-sm font-semibold text-gray-800 dark:text-white">+ Add New Test Case</h4>
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <form @submit.prevent="addTestCase()" class="mt-5 space-y-4 border-t border-[#E2DDD3] pt-5 dark:border-[#2C2B27]">
+          <h4 class="font-mono text-[11px] tracking-[0.14em] text-[#1C1B18] uppercase dark:text-[#EAE6DD]">
+            + Append Test Case
+          </h4>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label class="mb-1 block text-xs text-gray-500">Input Data (leave empty if none)</label>
+              <label class="mb-1 block font-mono text-[10px] text-[#6E6A61] uppercase dark:text-[#9B968B]">Input (optional)</label>
               <textarea
                 rows="3"
                 x-model="newTestCase.input_data"
-                placeholder="e.g. 5&#10;10"
-                class="w-full rounded-xl border border-gray-300 bg-transparent p-2.5 font-mono text-xs text-gray-900 dark:border-gray-700 dark:text-white"
+                placeholder="5&#10;10"
+                class="w-full border border-[#D7D1C5] bg-transparent p-2.5 font-mono text-xs text-[#1C1B18] focus:border-[#1C1B18] focus:outline-none dark:border-[#2C2B27] dark:text-[#EAE6DD]"
               ></textarea>
             </div>
             <div>
-              <label class="mb-1 block text-xs text-gray-500">Expected Output *</label>
+              <label class="mb-1 block font-mono text-[10px] text-[#6E6A61] uppercase dark:text-[#9B968B]">Expected Output *</label>
               <textarea
                 rows="3"
                 required
                 x-model="newTestCase.expected_output"
-                placeholder="e.g. 15"
-                class="w-full rounded-xl border border-gray-300 bg-transparent p-2.5 font-mono text-xs text-gray-900 dark:border-gray-700 dark:text-white"
+                placeholder="15"
+                class="w-full border border-[#D7D1C5] bg-transparent p-2.5 font-mono text-xs text-[#1C1B18] focus:border-[#1C1B18] focus:outline-none dark:border-[#2C2B27] dark:text-[#EAE6DD]"
               ></textarea>
             </div>
           </div>
-          <div class="flex justify-end gap-2">
+          <div class="flex justify-end gap-3">
             <button
               type="button"
               @click="testCaseModalOpen = false"
-              class="rounded-xl border border-gray-300 px-4 py-2 text-xs font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
+              class="border border-[#D7D1C5] px-4 py-2 text-xs font-medium text-[#6E6A61] hover:text-[#1C1B18] dark:border-[#2C2B27] dark:text-[#9B968B]"
             >
               Close
             </button>
             <button
               type="submit"
-              class="rounded-xl bg-brand-500 px-4 py-2 text-xs font-medium text-white hover:bg-brand-600"
+              class="border border-[#1C1B18] bg-[#1C1B18] px-4 py-2 text-xs font-medium text-[#F6F4EF] hover:bg-[#33312C] dark:border-[#EAE6DD] dark:bg-[#EAE6DD] dark:text-[#141413]"
             >
               + Add Test Case
             </button>
@@ -1073,44 +1289,53 @@
     <div
       x-cloak
       x-show="ticketModalOpen"
-      class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-xs"
+      class="fixed inset-0 z-99999 flex items-center justify-center bg-[#1C1B18]/45 p-4 backdrop-blur-xs"
     >
       <div
         @click.outside="ticketModalOpen = false"
-        class="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xl dark:border-gray-800 dark:bg-gray-900"
+        class="w-full max-w-md border border-[#E2DDD3] bg-[#FBF9F5] p-7 shadow-xl dark:border-[#2C2B27] dark:bg-[#1B1B19]"
       >
-        <h3 class="text-lg font-bold text-gray-900 dark:text-white">🎫 Create New IT Ticket</h3>
-        <form @submit.prevent="createTicket()" class="mt-4 space-y-4">
+        <p class="font-mono text-[10px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
+          Helpdesk Entry
+        </p>
+        <h3 class="mt-1 font-serif text-2xl font-normal text-[#1C1B18] dark:text-[#EAE6DD]">
+          Log IT Support Ticket
+        </h3>
+        <form @submit.prevent="createTicket()" class="mt-5 space-y-4">
           <div>
-            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Discord User ID / Name</label>
+            <label class="mb-1.5 block font-mono text-[11px] tracking-wider text-[#6E6A61] uppercase dark:text-[#9B968B]">
+              Discord User ID / Name
+            </label>
             <input
               type="text"
               required
               x-model="ticketForm.user_discord_id"
-              class="w-full rounded-xl border border-gray-300 bg-transparent px-3.5 py-2 text-sm text-gray-900 dark:border-gray-700 dark:text-white"
+              class="w-full border border-[#D7D1C5] bg-transparent px-3.5 py-2.5 text-sm text-[#1C1B18] focus:border-[#1C1B18] focus:outline-none dark:border-[#2C2B27] dark:text-[#EAE6DD]"
             />
           </div>
           <div>
-            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Issue Description *</label>
+            <label class="mb-1.5 block font-mono text-[11px] tracking-wider text-[#6E6A61] uppercase dark:text-[#9B968B]">
+              Issue Description *
+            </label>
             <textarea
               rows="4"
               required
               x-model="ticketForm.issue_description"
-              placeholder="Describe the issue..."
-              class="w-full rounded-xl border border-gray-300 bg-transparent p-3 text-sm text-gray-900 dark:border-gray-700 dark:text-white"
+              placeholder="Describe the incident or support request..."
+              class="w-full border border-[#D7D1C5] bg-transparent p-3.5 text-sm text-[#1C1B18] focus:border-[#1C1B18] focus:outline-none dark:border-[#2C2B27] dark:text-[#EAE6DD]"
             ></textarea>
           </div>
-          <div class="flex justify-end gap-2">
+          <div class="flex justify-end gap-3 border-t border-[#E2DDD3] pt-4 dark:border-[#2C2B27]">
             <button
               type="button"
               @click="ticketModalOpen = false"
-              class="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
+              class="border border-[#D7D1C5] px-4 py-2 text-xs font-medium text-[#6E6A61] hover:text-[#1C1B18] dark:border-[#2C2B27] dark:text-[#9B968B]"
             >
               Cancel
             </button>
             <button
               type="submit"
-              class="rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
+              class="border border-[#1C1B18] bg-[#1C1B18] px-5 py-2 text-xs font-medium text-[#F6F4EF] hover:bg-[#33312C] dark:border-[#EAE6DD] dark:bg-[#EAE6DD] dark:text-[#141413]"
             >
               Submit Ticket
             </button>
@@ -1123,41 +1348,55 @@
     <div
       x-cloak
       x-show="submissionModalOpen"
-      class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-xs"
+      class="fixed inset-0 z-99999 flex items-center justify-center bg-[#1C1B18]/45 p-4 backdrop-blur-xs"
     >
       <div
         @click.outside="submissionModalOpen = false"
-        class="w-full max-w-xl rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xl dark:border-gray-800 dark:bg-gray-900"
+        class="w-full max-w-2xl border border-[#E2DDD3] bg-[#FBF9F5] p-7 shadow-xl dark:border-[#2C2B27] dark:bg-[#1B1B19]"
       >
-        <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
-          <h3
-            class="text-lg font-bold text-gray-900 dark:text-white"
-            x-text="selectedSubmission ? `Submission #${selectedSubmission.id}` : ''"
-          ></h3>
+        <div class="flex items-start justify-between border-b border-[#E2DDD3] pb-4 dark:border-[#2C2B27]">
+          <div>
+            <p class="font-mono text-[10px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
+              Source Inspection
+            </p>
+            <h3
+              class="mt-1 font-serif text-2xl font-normal text-[#1C1B18] dark:text-[#EAE6DD]"
+              x-text="selectedSubmission ? `Submission #${selectedSubmission.id}` : ''"
+            ></h3>
+          </div>
           <button
             type="button"
             @click="submissionModalOpen = false"
-            class="text-gray-400 hover:text-gray-600 dark:hover:text-white"
+            class="font-mono text-xs text-[#6E6A61] hover:text-[#1C1B18] dark:text-[#9B968B] dark:hover:text-[#EAE6DD]"
           >
-            ✕
+            ESC
           </button>
         </div>
         <template x-if="selectedSubmission">
-          <div class="mt-4 space-y-3 text-sm">
-            <div class="flex flex-wrap gap-4 text-xs text-gray-500 dark:text-gray-400">
-              <span>User: <b class="text-gray-800 dark:text-white" x-text="selectedSubmission.user_discord_id"></b></span>
-              <span>Problem: <b class="text-gray-800 dark:text-white" x-text="`#${selectedSubmission.problem_id}`"></b></span>
-              <span>Status: <b class="text-brand-500" x-text="selectedSubmission.status"></b></span>
-              <span>Runtime: <b class="text-gray-800 dark:text-white" x-text="selectedSubmission.runtime != null ? `${selectedSubmission.runtime}s` : '-'"></b></span>
+          <div class="mt-5 space-y-5 text-sm">
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-[#E2DDD3] pb-4 font-mono text-xs text-[#6E6A61] dark:border-[#2C2B27] dark:text-[#9B968B]">
+              <span>User: <strong class="font-medium text-[#1C1B18] dark:text-[#EAE6DD]" x-text="selectedSubmission.user_discord_id"></strong></span>
+              <span>Problem: <strong class="font-medium text-[#1C1B18] dark:text-[#EAE6DD]" x-text="`#${selectedSubmission.problem_id}`"></strong></span>
+              <span class="inline-flex items-center gap-1.5">
+                Verdict:
+                <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(selectedSubmission.status)"></span>
+                <strong class="font-medium" :class="statusTextClass(selectedSubmission.status)" x-text="selectedSubmission.status"></strong>
+              </span>
+              <span>Runtime: <strong class="font-medium text-[#1C1B18] dark:text-[#EAE6DD]" x-text="selectedSubmission.runtime != null ? `${selectedSubmission.runtime}s` : '—'"></strong></span>
+              <span x-text="formatRelativeTime(selectedSubmission.created_at)" :title="formatExactDate(selectedSubmission.created_at)"></span>
             </div>
             <div>
-              <span class="text-xs font-semibold uppercase text-gray-400">Source Code:</span>
-              <pre class="mt-1 max-h-60 overflow-auto rounded-xl bg-gray-900 p-4 font-mono text-xs text-gray-100" x-text="selectedSubmission.source_code"></pre>
+              <span class="font-mono text-[10px] tracking-[0.14em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
+                Python Source
+              </span>
+              <pre class="mt-2 max-h-72 overflow-auto border border-[#2C2B27] bg-[#141413] p-4 font-mono text-xs leading-relaxed text-[#EAE6DD]" x-text="selectedSubmission.source_code"></pre>
             </div>
             <template x-if="selectedSubmission.error_message">
               <div>
-                <span class="text-xs font-semibold uppercase text-red-500">Error Output:</span>
-                <pre class="mt-1 max-h-40 overflow-auto rounded-xl bg-red-950/90 p-3 font-mono text-xs text-red-200" x-text="selectedSubmission.error_message"></pre>
+                <span class="font-mono text-[10px] tracking-[0.14em] text-[#8B2635] uppercase dark:text-[#D47A86]">
+                  Sandbox Error Output
+                </span>
+                <pre class="mt-2 max-h-40 overflow-auto border border-[#8B2635]/30 bg-[#8B2635]/10 p-3.5 font-mono text-xs leading-relaxed text-[#8B2635] dark:bg-[#8B2635]/15 dark:text-[#D47A86]" x-text="selectedSubmission.error_message"></pre>
               </div>
             </template>
           </div>

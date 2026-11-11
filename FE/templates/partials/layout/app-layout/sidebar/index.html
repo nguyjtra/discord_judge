@@ -1,10 +1,11 @@
-<!-- This allows screen readers to skip the sidebar and go directly to the main content. -->
+<!-- Skip to main content -->
 <a class="sr-only" href="#main-content">skip to the main content</a>
+
 <!-- Sidebar Backdrop (Mobile) -->
 <div
   x-cloak
   x-show="sidebarToggle"
-  class="fixed inset-0 z-99 bg-gray-900/50 backdrop-blur-xs xl:hidden"
+  class="fixed inset-0 z-99 bg-[#1C1B18]/40 backdrop-blur-xs xl:hidden"
   aria-hidden="true"
   @click="sidebarToggle = false"
   x-transition.opacity
@@ -12,80 +13,67 @@
 
 <aside
   x-cloak
-  :class="sidebarToggle ? 'translate-x-0 xl:w-22.5' : '-translate-x-full rtl:translate-x-full'"
-  class="sidebar fixed top-0 left-0 z-9999 flex h-screen w-72.5 flex-col border-r border-gray-200 bg-white px-5 transition-all duration-300 xl:static xl:translate-x-0 rtl:right-0 rtl:left-auto rtl:border-r-0 rtl:border-l dark:border-gray-800 dark:bg-black"
+  :class="sidebarToggle ? 'translate-x-0 xl:w-20' : '-translate-x-full'"
+  class="sidebar fixed top-0 left-0 z-9999 flex h-screen w-68 flex-col border-r border-[#E2DDD3] bg-[#F1EEE7] px-5 transition-all duration-300 xl:static xl:translate-x-0 dark:border-[#2C2B27] dark:bg-[#181816]"
   @click.outside="if (window.innerWidth < 1280) sidebarToggle = false"
   aria-label="sidebar navigation"
 >
-  <!-- Sidebar Header -->
+  <!-- Editorial Masthead Brand -->
   <div
     :class="sidebarToggle ? 'xl:justify-center' : 'justify-between'"
-    class="sidebar-header flex items-center gap-2 py-7"
+    class="flex items-center gap-3 border-b border-[#E2DDD3] py-7 dark:border-[#2C2B27]"
   >
-    <a href="/admin" class="flex items-center gap-3">
-      <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white font-semibold text-lg shadow-theme-xs">
-        DJ
+    <a href="/admin" class="flex items-center gap-3.5">
+      <div class="flex h-9 w-9 shrink-0 items-center justify-center border border-[#1C1B18] bg-[#1C1B18] font-serif text-base italic text-[#F6F4EF] dark:border-[#EAE6DD] dark:bg-[#EAE6DD] dark:text-[#141413]">
+        D
       </div>
-      <div class="logo" :class="sidebarToggle ? 'xl:hidden' : ''">
-        <span class="block text-base font-semibold text-gray-900 dark:text-white">Discord Judge</span>
-        <span class="block text-xs text-gray-500 dark:text-gray-400">Admin &amp; IT Helpdesk</span>
+      <div :class="sidebarToggle ? 'xl:hidden' : ''">
+        <span class="block font-serif text-lg leading-tight font-medium tracking-tight text-[#1C1B18] dark:text-[#EAE6DD]">
+          Discord Judge
+        </span>
+        <span class="mt-0.5 block font-mono text-[10px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
+          Console · Admin
+        </span>
       </div>
     </a>
   </div>
 
-  <div
-    class="no-scrollbar flex flex-1 flex-col overflow-y-auto duration-300 ease-linear"
-  >
-    <nav aria-label="sidebar navigation">
+  <!-- Navigation -->
+  <div class="no-scrollbar flex flex-1 flex-col justify-between overflow-y-auto py-7">
+    <nav aria-label="sidebar navigation" class="space-y-8">
       <div>
-        <h3 class="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase" :class="sidebarToggle ? 'xl:hidden' : ''">
-          ADMIN MENU
+        <h3
+          class="mb-3 px-2 font-mono text-[10px] font-medium tracking-[0.18em] text-[#9A9488] uppercase dark:text-[#6E6A61]"
+          :class="sidebarToggle ? 'xl:hidden' : ''"
+        >
+          Index
         </h3>
-        <ul class="mb-6 flex flex-col gap-1.5">
+        <ul class="flex flex-col gap-1">
           <li>
             <button
               type="button"
-              @click="activeTab = 'all'"
-              class="group menu-item w-full text-left"
+              @click="activeTab = 'all'; if (window.innerWidth < 1280) sidebarToggle = false"
+              class="menu-item w-full text-left"
               :class="activeTab === 'all' ? 'menu-item-active' : 'menu-item-inactive'"
             >
-              <svg class="size-5 shrink-0" :class="activeTab === 'all' ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-              </svg>
-              <span class="menu-item-text" :class="sidebarToggle ? 'xl:hidden' : ''">Dashboard (All)</span>
+              <span class="font-mono text-[11px] opacity-60 shrink-0">00</span>
+              <span class="flex-1 truncate" :class="sidebarToggle ? 'xl:hidden' : ''">Overview</span>
             </button>
           </li>
 
           <li>
             <button
               type="button"
-              @click="activeTab = 'problems'"
-              class="group menu-item w-full text-left"
+              @click="activeTab = 'problems'; if (window.innerWidth < 1280) sidebarToggle = false"
+              class="menu-item w-full text-left"
               :class="activeTab === 'problems' ? 'menu-item-active' : 'menu-item-inactive'"
             >
-              <svg class="size-5 shrink-0" :class="activeTab === 'problems' ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-              </svg>
-              <span class="menu-item-text flex-1" :class="sidebarToggle ? 'xl:hidden' : ''">Problems</span>
-              <span :class="sidebarToggle ? 'xl:hidden' : ''" class="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-600 dark:bg-brand-500/15 dark:text-brand-400" x-text="problems.length">0</span>
-            </button>
-          </li>
-
-          <li>
-            <button
-              type="button"
-              @click="activeTab = 'tickets'"
-              class="group menu-item w-full text-left"
-              :class="activeTab === 'tickets' ? 'menu-item-active' : 'menu-item-inactive'"
-            >
-              <svg class="size-5 shrink-0" :class="activeTab === 'tickets' ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
-              </svg>
-              <span class="menu-item-text flex-1" :class="sidebarToggle ? 'xl:hidden' : ''">IT Tickets</span>
+              <span class="font-mono text-[11px] opacity-60 shrink-0">01</span>
+              <span class="flex-1 truncate" :class="sidebarToggle ? 'xl:hidden' : ''">Problems</span>
               <span
                 :class="sidebarToggle ? 'xl:hidden' : ''"
-                class="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-600 dark:bg-amber-500/15 dark:text-amber-400"
-                x-text="openTicketsCount"
+                class="font-mono text-xs tabular-nums text-[#6E6A61] dark:text-[#9B968B]"
+                x-text="problems.length"
               >0</span>
             </button>
           </li>
@@ -93,51 +81,87 @@
           <li>
             <button
               type="button"
-              @click="activeTab = 'submissions'"
-              class="group menu-item w-full text-left"
+              @click="activeTab = 'tickets'; if (window.innerWidth < 1280) sidebarToggle = false"
+              class="menu-item w-full text-left"
+              :class="activeTab === 'tickets' ? 'menu-item-active' : 'menu-item-inactive'"
+            >
+              <span class="font-mono text-[11px] opacity-60 shrink-0">02</span>
+              <span class="flex-1 truncate" :class="sidebarToggle ? 'xl:hidden' : ''">IT Tickets</span>
+              <span
+                :class="sidebarToggle ? 'xl:hidden' : ''"
+                class="inline-flex items-center gap-1.5 font-mono text-xs tabular-nums text-[#6E6A61] dark:text-[#9B968B]"
+              >
+                <span x-show="openTicketsCount > 0" class="h-1.5 w-1.5 rounded-full bg-[#9A6B2F] dark:bg-[#D4A362]"></span>
+                <span x-text="openTicketsCount">0</span>
+              </span>
+            </button>
+          </li>
+
+          <li>
+            <button
+              type="button"
+              @click="activeTab = 'submissions'; if (window.innerWidth < 1280) sidebarToggle = false"
+              class="menu-item w-full text-left"
               :class="activeTab === 'submissions' ? 'menu-item-active' : 'menu-item-inactive'"
             >
-              <svg class="size-5 shrink-0" :class="activeTab === 'submissions' ? 'menu-item-icon-active' : 'menu-item-icon-inactive'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-              </svg>
-              <span class="menu-item-text flex-1" :class="sidebarToggle ? 'xl:hidden' : ''">Submissions</span>
-              <span :class="sidebarToggle ? 'xl:hidden' : ''" class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-white/10 dark:text-gray-300" x-text="submissions.length">0</span>
+              <span class="font-mono text-[11px] opacity-60 shrink-0">03</span>
+              <span class="flex-1 truncate" :class="sidebarToggle ? 'xl:hidden' : ''">Submissions</span>
+              <span
+                :class="sidebarToggle ? 'xl:hidden' : ''"
+                class="font-mono text-xs tabular-nums text-[#6E6A61] dark:text-[#9B968B]"
+                x-text="submissions.length"
+              >0</span>
             </button>
           </li>
         </ul>
       </div>
 
-      <div>
-        <h3 class="mb-3 text-xs font-semibold tracking-wider text-gray-400 uppercase" :class="sidebarToggle ? 'xl:hidden' : ''">
-          QUICK LINKS
+      <div class="border-t border-[#E2DDD3] pt-6 dark:border-[#2C2B27]">
+        <h3
+          class="mb-3 px-2 font-mono text-[10px] font-medium tracking-[0.18em] text-[#9A9488] uppercase dark:text-[#6E6A61]"
+          :class="sidebarToggle ? 'xl:hidden' : ''"
+        >
+          Actions
         </h3>
-        <ul class="flex flex-col gap-1.5">
+        <ul class="flex flex-col gap-1">
           <li>
             <button
               type="button"
               @click="openCreateProblem()"
-              class="group menu-item menu-item-inactive w-full text-left"
+              class="menu-item menu-item-inactive w-full text-left"
             >
-              <svg class="size-5 shrink-0 menu-item-icon-inactive" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              <svg class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
-              <span class="menu-item-text" :class="sidebarToggle ? 'xl:hidden' : ''">+ Add New Problem</span>
+              <span :class="sidebarToggle ? 'xl:hidden' : ''">New Problem</span>
             </button>
           </li>
           <li>
             <a
               href="/docs"
               target="_blank"
-              class="group menu-item menu-item-inactive"
+              class="menu-item menu-item-inactive"
             >
-              <svg class="size-5 shrink-0 menu-item-icon-inactive" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              <svg class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H8M17 7v9" />
               </svg>
-              <span class="menu-item-text" :class="sidebarToggle ? 'xl:hidden' : ''">Swagger API (/docs)</span>
+              <span :class="sidebarToggle ? 'xl:hidden' : ''">API Docs</span>
             </a>
           </li>
         </ul>
       </div>
     </nav>
+
+    <div
+      :class="sidebarToggle ? 'xl:hidden' : ''"
+      class="border-t border-[#E2DDD3] pt-5 dark:border-[#2C2B27]"
+    >
+      <p class="font-mono text-[10px] tracking-[0.12em] text-[#9A9488] uppercase dark:text-[#6E6A61]">
+        Single-Admin Workspace
+      </p>
+      <p class="mt-1 text-xs text-[#6E6A61] dark:text-[#9B968B]">
+        Docker Sandbox &amp; Discord Bot
+      </p>
+    </div>
   </div>
 </aside>
