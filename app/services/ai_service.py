@@ -10,9 +10,6 @@ api_key = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=api_key)
 
 def explain_code_error(source_code: str) -> str:
-    """
-    Hàm này nhận đoạn code bị lỗi, tạo Prompt và nhờ AI giải thích.
-    """
     try:
         model = genai.GenerativeModel("gemini-3.5-flash-lite")
         prompt = f"""
