@@ -13,7 +13,6 @@ intents = discord.Intents.default()
 intents.message_content = True
 # Lệnh bắt đầu bằng dấu *
 bot = commands.Bot(command_prefix='*', intents=intents)
-
 # SỰ KIỆN KHI BOT TỈNH DẬY
 @bot.event
 async def on_ready():
