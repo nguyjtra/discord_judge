@@ -7,20 +7,389 @@
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>
-      Basic Tables | TailAdmin - Tailwind CSS Admin Dashboard Template
-    </title>
+    <title>Discord Judge Admin | Problems &amp; IT Tickets</title>
+    <link rel="icon" href="/images/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/asset/css/prism.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss" id="tailadmin-style"></style>
+    <script type="importmap">
+      {
+        "imports": {
+          "alpinejs": "https://esm.sh/alpinejs@3.14.8",
+          "@alpinejs/persist": "https://esm.sh/@alpinejs/persist@3.14.8?external=alpinejs",
+          "@alpinejs/collapse": "https://esm.sh/@alpinejs/collapse@3.14.8?external=alpinejs",
+          "@tanstack/alpine-table": "https://esm.sh/@tanstack/alpine-table@8.20.5?external=alpinejs",
+          "@floating-ui/dom": "https://esm.sh/@floating-ui/dom@1.6.12"
+        }
+      }
+    </script>
+    <script type="module">
+      import Alpine from "alpinejs";
+      import persist from "@alpinejs/persist";
+      import collapse from "@alpinejs/collapse";
+      import dropdown from "/asset/js/components/ui/dropdown.js";
+      import popover from "/asset/js/components/ui/popover.js";
+      import tooltip from "/asset/js/components/ui/tooltip.js";
+
+      const res = await fetch("/asset/locales/en/common.json");
+      const translations = res.ok ? await res.json() : {};
+      const getByPath = (obj, path) =>
+        String(path || "")
+          .split(".")
+          .reduce((acc, k) => (acc && acc[k] !== undefined ? acc[k] : undefined), obj) ?? path;
+
+      Alpine.plugin(persist);
+      Alpine.plugin(collapse);
+      window.Alpine = Alpine;
+
+      Alpine.store("i18n", {
+        currentLocale: "en",
+        dir: "ltr",
+        locales: [
+          {
+            code: "en",
+            name: "English",
+            shortName: "English",
+            country: "USA",
+            flag: "/images/flag/flag-us.svg",
+          },
+        ],
+        get currentLang() {
+          return this.locales[0];
+        },
+        t(key) {
+          return getByPath(translations, key);
+        },
+        setLocale() {},
+      });
+      Alpine.magic("t", () => (key) => getByPath(translations, key));
+
+      Alpine.data("dropdown", dropdown);
+      Alpine.data("popover", popover);
+      Alpine.data("tooltip", tooltip);
+
+      Alpine.data("adminApp", () => ({
+        page: "adminDashboard",
+        loaded: false,
+        darkMode: JSON.parse(localStorage.getItem("darkMode")) ?? false,
+        stickyMenu: false,
+        sidebarToggle: false,
+        scrollTop: false,
+        activeTab: "all",
+
+        problems: [],
+        tickets: [],
+        submissions: [],
+        searchQuery: "",
+        ticketFilter: "ALL",
+        toastMessage: "",
+
+        // Problem Modal (Add / Edit)
+        problemModalOpen: false,
+        isEditingProblem: false,
+        problemForm: {
+          id: null,
+          title: "",
+          description: "",
+          difficulty: "Easy",
+          time_limit: 1.0,
+          memory_limit: 256,
+        },
+
+        // Test Cases Modal
+        testCaseModalOpen: false,
+        selectedProblem: null,
+        testCases: [],
+        newTestCase: {
+          input_data: "",
+          expected_output: "",
+        },
+
+        // Create Ticket Modal
+        ticketModalOpen: false,
+        ticketForm: {
+          user_discord_id: "admin",
+          issue_description: "",
+        },
+
+        // View Submission Modal
+        submissionModalOpen: false,
+        selectedSubmission: null,
+
+        init() {
+          this.$watch("darkMode", (value) =>
+            localStorage.setItem("darkMode", JSON.stringify(value))
+          );
+          this.fetchAllData();
+        },
+
+        showToast(msg) {
+          this.toastMessage = msg;
+          setTimeout(() => {
+            if (this.toastMessage === msg) this.toastMessage = "";
+          }, 3000);
+        },
+
+        async fetchAllData() {
+          await Promise.all([
+            this.fetchProblems(),
+            this.fetchTickets(),
+            this.fetchSubmissions(),
+          ]);
+        },
+
+        async fetchProblems() {
+          try {
+            const r = await fetch("/api/problems/");
+            if (r.ok) this.problems = await r.json();
+          } catch (e) {
+            console.error(e);
+          }
+        },
+
+        async fetchTickets() {
+          try {
+            const r = await fetch("/api/tickets/");
+            if (r.ok) this.tickets = await r.json();
+          } catch (e) {
+            console.error(e);
+          }
+        },
+
+        async fetchSubmissions() {
+          try {
+            const r = await fetch("/api/submissions/");
+            if (r.ok) this.submissions = await r.json();
+          } catch (e) {
+            console.error(e);
+          }
+        },
+
+        get openTicketsCount() {
+          return this.tickets.filter((t) => t.status !== "Resolved").length;
+        },
+
+        get acceptedSubmissionsCount() {
+          return this.submissions.filter(
+            (s) => s.status === "Accepted" || s.status === "ACCEPTED"
+          ).length;
+        },
+
+        get filteredProblems() {
+          const q = this.searchQuery.trim().toLowerCase();
+          if (!q) return this.problems;
+          return this.problems.filter(
+            (p) =>
+              String(p.id).includes(q) ||
+              (p.title || "").toLowerCase().includes(q) ||
+              (p.difficulty || "").toLowerCase().includes(q)
+          );
+        },
+
+        get filteredTickets() {
+          return this.tickets.filter((t) => {
+            if (this.ticketFilter !== "ALL" && t.status !== this.ticketFilter) {
+              return false;
+            }
+            const q = this.searchQuery.trim().toLowerCase();
+            if (!q) return true;
+            return (
+              String(t.id).includes(q) ||
+              (t.user_discord_id || "").toLowerCase().includes(q) ||
+              (t.issue_description || "").toLowerCase().includes(q)
+            );
+          });
+        },
+
+        // --- PROBLEM CRUD ---
+        openCreateProblem() {
+          this.isEditingProblem = false;
+          this.problemForm = {
+            id: null,
+            title: "",
+            description: "",
+            difficulty: "Easy",
+            time_limit: 1.0,
+            memory_limit: 256,
+          };
+          this.problemModalOpen = true;
+        },
+
+        openEditProblem(p) {
+          this.isEditingProblem = true;
+          this.problemForm = {
+            id: p.id,
+            title: p.title,
+            description: p.description,
+            difficulty: p.difficulty || "Easy",
+            time_limit: p.time_limit ?? 1.0,
+            memory_limit: p.memory_limit ?? 256,
+          };
+          this.problemModalOpen = true;
+        },
+
+        async saveProblem() {
+          const payload = {
+            title: this.problemForm.title,
+            description: this.problemForm.description,
+            difficulty: this.problemForm.difficulty,
+            time_limit: Number(this.problemForm.time_limit) || 1.0,
+            memory_limit: Number(this.problemForm.memory_limit) || 256,
+          };
+
+          const url = this.isEditingProblem
+            ? `/api/problems/${this.problemForm.id}`
+            : "/api/problems/";
+          const method = this.isEditingProblem ? "PUT" : "POST";
+
+          const r = await fetch(url, {
+            method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          if (r.ok) {
+            this.problemModalOpen = false;
+            await this.fetchProblems();
+            this.showToast(
+              this.isEditingProblem
+                ? "✅ Problem updated!"
+                : "✅ New problem added!"
+            );
+          } else {
+            alert("Failed to save problem!");
+          }
+        },
+
+        async deleteProblem(id) {
+          if (!confirm(`Delete Problem #${id} and all its data?`)) return;
+          const r = await fetch(`/api/problems/${id}`, { method: "DELETE" });
+          if (r.ok) {
+            await this.fetchProblems();
+            await this.fetchSubmissions();
+            this.showToast(`🗑️ Deleted Problem #${id}`);
+          }
+        },
+
+        // --- TEST CASES ---
+        async openTestCasesModal(problem) {
+          this.selectedProblem = problem;
+          this.newTestCase = { input_data: "", expected_output: "" };
+          this.testCaseModalOpen = true;
+          await this.fetchTestCases(problem.id);
+        },
+
+        async fetchTestCases(problemId) {
+          const r = await fetch(`/api/problems/${problemId}/test-cases`);
+          if (r.ok) {
+            this.testCases = await r.json();
+          }
+        },
+
+        async addTestCase() {
+          if (!this.selectedProblem) return;
+          const r = await fetch(
+            `/api/problems/${this.selectedProblem.id}/test-cases`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(this.newTestCase),
+            }
+          );
+          if (r.ok) {
+            this.newTestCase = { input_data: "", expected_output: "" };
+            await this.fetchTestCases(this.selectedProblem.id);
+            this.showToast("✅ Test case added!");
+          }
+        },
+
+        async removeTestCase(tcId) {
+          const r = await fetch(`/api/problems/test-cases/${tcId}`, {
+            method: "DELETE",
+          });
+          if (r.ok && this.selectedProblem) {
+            await this.fetchTestCases(this.selectedProblem.id);
+            this.showToast("🗑️ Test case deleted!");
+          }
+        },
+
+        // --- IT TICKETS ---
+        async updateTicketStatus(ticketId, newStatus) {
+          const r = await fetch(`/api/tickets/${ticketId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: newStatus }),
+          });
+          if (r.ok) {
+            await this.fetchTickets();
+            this.showToast(`✅ Ticket #${ticketId} -> ${newStatus}`);
+          }
+        },
+
+        async createTicket() {
+          if (!this.ticketForm.issue_description.trim()) return;
+          const r = await fetch("/api/tickets/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(this.ticketForm),
+          });
+          if (r.ok) {
+            this.ticketModalOpen = false;
+            this.ticketForm.issue_description = "";
+            await this.fetchTickets();
+            this.showToast("✅ New IT Ticket created!");
+          }
+        },
+
+        async removeTicket(ticketId) {
+          if (!confirm(`Delete Ticket #${ticketId}?`)) return;
+          const r = await fetch(`/api/tickets/${ticketId}`, {
+            method: "DELETE",
+          });
+          if (r.ok) {
+            await this.fetchTickets();
+            this.showToast(`🗑️ Deleted Ticket #${ticketId}`);
+          }
+        },
+
+        openSubmissionDetail(sub) {
+          this.selectedSubmission = sub;
+          this.submissionModalOpen = true;
+        },
+
+        formatDate(dtStr) {
+          if (!dtStr) return "-";
+          const d = new Date(dtStr);
+          return isNaN(d.getTime()) ? dtStr : d.toLocaleString("en-US");
+        },
+      }));
+
+      Alpine.start();
+      window.dispatchEvent(new Event("DOMContentLoaded"));
+    </script>
   </head>
   <body
-    x-data="{ page: 'basicTables', 'loaded': true, 'darkMode': false, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
-    x-init="
-         darkMode = JSON.parse(localStorage.getItem('darkMode')) ?? false;
-         $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+    x-data="adminApp()"
     :class="{'dark bg-gray-900': darkMode === true}"
   >
     <!-- ===== Preloader Start ===== -->
     <include src="./partials/common/preloader.html"></include>
     <!-- ===== Preloader End ===== -->
+
+    <!-- Toast Notification -->
+    <div
+      x-cloak
+      x-show="toastMessage"
+      x-transition
+      class="fixed bottom-5 right-5 z-999999 rounded-xl bg-gray-900 px-4 py-3 text-sm font-medium text-white shadow-theme-lg dark:bg-brand-500"
+      x-text="toastMessage"
+    ></div>
 
     <!-- ===== Page Wrapper Start ===== -->
     <div class="flex h-screen overflow-hidden">
@@ -39,93 +408,380 @@
         <!-- ===== Main Content Start ===== -->
         <main id="main-content">
           <div
-            class="mx-auto max-w-(--breakpoint-2xl) p-4 pb-20 md:p-6 md:pb-6"
+            class="mx-auto max-w-(--breakpoint-2xl) p-4 pb-20 md:p-6 md:pb-10 space-y-6"
           >
-            <!-- Breadcrumb Start -->
-            <div x-data="{ pageTitle: 'Basic Tables' }">
-              <include src="./partials/common/page-breadcrumb.html" />
+            <!-- Top Bar & Quick Actions -->
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                  Discord Judge — Admin Dashboard
+                </h1>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  Manage coding problems (Add / Edit / Delete), test cases, and Discord IT support tickets.
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2.5">
+                <button
+                  type="button"
+                  @click="fetchAllData(); showToast('🔄 Data refreshed!')"
+                  class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                >
+                  🔄 Refresh
+                </button>
+                <button
+                  type="button"
+                  @click="ticketModalOpen = true"
+                  class="inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-700 hover:bg-amber-100 dark:border-amber-500/30 dark:bg-amber-500/15 dark:text-amber-300"
+                >
+                  🎫 + New Ticket
+                </button>
+                <button
+                  type="button"
+                  @click="openCreateProblem()"
+                  class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-theme-xs hover:bg-brand-600"
+                >
+                  ➕ Add Problem
+                </button>
+              </div>
             </div>
-            <!-- Breadcrumb End -->
 
-            <div class="space-y-5 sm:space-y-6">
-              <!-- Basic Table 1 -->
-              <div
-                class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3"
-              >
-                <div x-data="{ cardTitle: 'Basic Table 1' }">
-                  <include src="./partials/common/component-card-header.html" />
-                </div>
-                <div
-                  class="space-y-6 border-t border-gray-100 p-4 sm:p-6 dark:border-gray-800"
-                >
-                  <include
-                    src="./partials/main/tables/basic-tables/table-01.html"
-                  />
+            <!-- Summary Metric Cards -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
+                <span class="text-xs font-medium uppercase text-gray-400">Total Problems</span>
+                <div class="mt-2 flex items-baseline justify-between">
+                  <h3 class="text-3xl font-bold text-gray-900 dark:text-white" x-text="problems.length">0</h3>
+                  <span class="text-xs font-medium text-brand-500">Problems</span>
                 </div>
               </div>
 
-              <!-- Basic Table 2 -->
-              <div
-                class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3"
-              >
-                <div x-data="{ cardTitle: 'Basic Table 2' }">
-                  <include src="./partials/common/component-card-header.html" />
-                </div>
-                <div
-                  class="space-y-6 border-t border-gray-100 p-4 sm:p-6 dark:border-gray-800"
-                >
-                  <include
-                    src="./partials/main/tables/basic-tables/table-02.html"
-                  />
+              <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
+                <span class="text-xs font-medium uppercase text-gray-400">Open IT Tickets</span>
+                <div class="mt-2 flex items-baseline justify-between">
+                  <h3 class="text-3xl font-bold text-amber-500" x-text="openTicketsCount">0</h3>
+                  <span class="text-xs font-medium text-gray-500 dark:text-gray-400" x-text="`Total: ${tickets.length}`"></span>
                 </div>
               </div>
 
-              <!-- Basic Table 3 -->
-              <div
-                class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3"
-              >
-                <div x-data="{ cardTitle: 'Basic Table 3' }">
-                  <include src="./partials/common/component-card-header.html" />
-                </div>
-                <div
-                  class="space-y-6 border-t border-gray-100 p-4 sm:p-6 dark:border-gray-800"
-                >
-                  <include
-                    src="./partials/main/tables/basic-tables/table-03.html"
-                  />
+              <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
+                <span class="text-xs font-medium uppercase text-gray-400">Total Submissions</span>
+                <div class="mt-2 flex items-baseline justify-between">
+                  <h3 class="text-3xl font-bold text-gray-900 dark:text-white" x-text="submissions.length">0</h3>
+                  <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Last 50</span>
                 </div>
               </div>
 
-              <!-- Basic Table 4 -->
-              <div
-                class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3"
-              >
-                <div x-data="{ cardTitle: 'Basic Table 4' }">
-                  <include src="./partials/common/component-card-header.html" />
+              <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
+                <span class="text-xs font-medium uppercase text-gray-400">Accepted Submissions</span>
+                <div class="mt-2 flex items-baseline justify-between">
+                  <h3 class="text-3xl font-bold text-green-600 dark:text-green-400" x-text="acceptedSubmissionsCount">0</h3>
+                  <span class="text-xs font-medium text-green-600 dark:text-green-400">Passed</span>
                 </div>
-                <div
-                  class="space-y-6 border-t border-gray-100 p-4 sm:p-6 dark:border-gray-800"
-                >
-                  <include
-                    src="./partials/main/tables/basic-tables/table-04.html"
+              </div>
+            </div>
+
+            <!-- ==================== SECTION 1: PROBLEMS ==================== -->
+            <div
+              x-show="activeTab === 'all' || activeTab === 'problems'"
+              class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3"
+            >
+              <div class="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    📚 Problems &amp; Test Cases
+                  </h2>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    Add, edit, or delete coding problems and manage their input/output test cases.
+                  </p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input
+                    type="text"
+                    x-model="searchQuery"
+                    placeholder="Search title, difficulty, #ID..."
+                    class="h-10 rounded-xl border border-gray-200 bg-transparent px-3.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-400 focus:outline-hidden dark:border-gray-700 dark:text-white"
                   />
+                  <button
+                    type="button"
+                    @click="openCreateProblem()"
+                    class="rounded-xl bg-brand-500 px-3.5 py-2 text-xs font-medium text-white hover:bg-brand-600"
+                  >
+                    + Add Problem
+                  </button>
                 </div>
               </div>
 
-              <!-- Basic Table 5 -->
-              <div
-                class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3"
-              >
-                <div x-data="{ cardTitle: 'Basic Table 5' }">
-                  <include src="./partials/common/component-card-header.html" />
+              <div class="overflow-x-auto p-4 sm:p-6">
+                <table class="min-w-full">
+                  <thead class="border-b border-gray-100 dark:border-white/5">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">ID</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Title</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Description</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Difficulty</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Limits</th>
+                      <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100 dark:divide-white/5">
+                    <template x-if="filteredProblems.length === 0">
+                      <tr>
+                        <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-400">
+                          No problems found. Click <b>"+ Add Problem"</b> to create one!
+                        </td>
+                      </tr>
+                    </template>
+                    <template x-for="p in filteredProblems" :key="p.id">
+                      <tr class="hover:bg-gray-50/60 dark:hover:bg-white/2">
+                        <td class="px-4 py-4 text-sm font-semibold text-gray-900 dark:text-white" x-text="`#${p.id}`"></td>
+                        <td class="px-4 py-4 text-sm font-medium text-gray-900 dark:text-white" x-text="p.title"></td>
+                        <td class="max-w-md px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
+                          <p class="line-clamp-2" x-text="p.description"></p>
+                        </td>
+                        <td class="px-4 py-4 text-sm">
+                          <span
+                            class="inline-flex rounded-lg px-2.5 py-0.5 text-xs font-medium"
+                            :class="{
+                              'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400': (p.difficulty || '').toLowerCase() === 'easy',
+                              'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400': (p.difficulty || '').toLowerCase() === 'medium',
+                              'bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-400': (p.difficulty || '').toLowerCase() === 'hard',
+                              'bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-gray-300': !['easy','medium','hard'].includes((p.difficulty || '').toLowerCase())
+                            }"
+                            x-text="p.difficulty || 'Easy'"
+                          ></span>
+                        </td>
+                        <td class="px-4 py-4 text-xs text-gray-500 dark:text-gray-400">
+                          <span x-text="`${p.time_limit || 1.0}s / ${p.memory_limit || 256}MB`"></span>
+                        </td>
+                        <td class="px-4 py-4 text-right text-sm whitespace-nowrap">
+                          <div class="inline-flex items-center gap-2">
+                            <button
+                              type="button"
+                              @click="openTestCasesModal(p)"
+                              class="rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-600 hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-brand-300"
+                            >
+                              🧪 Test Cases
+                            </button>
+                            <button
+                              type="button"
+                              @click="openEditProblem(p)"
+                              class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                            >
+                              ✏️ Edit
+                            </button>
+                            <button
+                              type="button"
+                              @click="deleteProblem(p.id)"
+                              class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-400"
+                            >
+                              🗑️ Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- ==================== SECTION 2: IT TICKETS ==================== -->
+            <div
+              x-show="activeTab === 'all' || activeTab === 'tickets'"
+              class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3"
+            >
+              <div class="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    🎫 IT Tickets (Discord Helpdesk)
+                  </h2>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    Tickets sent from Discord via <code class="rounded bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800">*ticket &lt;issue&gt;</code> appear here.
+                  </p>
                 </div>
-                <div
-                  class="space-y-6 border-t border-gray-100 p-4 sm:p-6 dark:border-gray-800"
-                >
-                  <include
-                    src="./partials/main/tables/basic-tables/table-05.html"
-                  />
+                <div class="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    @click="ticketFilter = 'ALL'"
+                    class="rounded-lg px-3 py-1.5 text-xs font-medium"
+                    :class="ticketFilter === 'ALL' ? 'bg-brand-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                  >
+                    All (<span x-text="tickets.length"></span>)
+                  </button>
+                  <button
+                    type="button"
+                    @click="ticketFilter = 'Open'"
+                    class="rounded-lg px-3 py-1.5 text-xs font-medium"
+                    :class="ticketFilter === 'Open' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                  >
+                    Open
+                  </button>
+                  <button
+                    type="button"
+                    @click="ticketFilter = 'In-Progress'"
+                    class="rounded-lg px-3 py-1.5 text-xs font-medium"
+                    :class="ticketFilter === 'In-Progress' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                  >
+                    In-Progress
+                  </button>
+                  <button
+                    type="button"
+                    @click="ticketFilter = 'Resolved'"
+                    class="rounded-lg px-3 py-1.5 text-xs font-medium"
+                    :class="ticketFilter === 'Resolved' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300'"
+                  >
+                    Resolved
+                  </button>
                 </div>
+              </div>
+
+              <div class="overflow-x-auto p-4 sm:p-6">
+                <table class="min-w-full">
+                  <thead class="border-b border-gray-100 dark:border-white/5">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Ticket ID</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Discord User ID</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Issue Description</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Status</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Created At</th>
+                      <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100 dark:divide-white/5">
+                    <template x-if="filteredTickets.length === 0">
+                      <tr>
+                        <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-400">
+                          No IT tickets found.
+                        </td>
+                      </tr>
+                    </template>
+                    <template x-for="t in filteredTickets" :key="t.id">
+                      <tr class="hover:bg-gray-50/60 dark:hover:bg-white/2">
+                        <td class="px-4 py-4 text-sm font-semibold text-gray-900 dark:text-white" x-text="`TICKET-#${t.id}`"></td>
+                        <td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300" x-text="t.user_discord_id"></td>
+                        <td class="max-w-md px-4 py-4 text-sm text-gray-800 dark:text-gray-200" x-text="t.issue_description"></td>
+                        <td class="px-4 py-4 text-sm">
+                          <span
+                            class="inline-flex rounded-lg px-2.5 py-0.5 text-xs font-medium"
+                            :class="{
+                              'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400': t.status === 'Open',
+                              'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400': t.status === 'In-Progress',
+                              'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400': t.status === 'Resolved'
+                            }"
+                            x-text="t.status"
+                          ></span>
+                        </td>
+                        <td class="px-4 py-4 text-xs text-gray-500 dark:text-gray-400" x-text="formatDate(t.created_at)"></td>
+                        <td class="px-4 py-4 text-right text-sm whitespace-nowrap">
+                          <div class="inline-flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              x-show="t.status !== 'In-Progress'"
+                              @click="updateTicketStatus(t.id, 'In-Progress')"
+                              class="rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100 dark:border-blue-500/30 dark:bg-blue-500/15 dark:text-blue-300"
+                            >
+                              In-Progress
+                            </button>
+                            <button
+                              type="button"
+                              x-show="t.status !== 'Resolved'"
+                              @click="updateTicketStatus(t.id, 'Resolved')"
+                              class="rounded-lg border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-medium text-green-600 hover:bg-green-100 dark:border-green-500/30 dark:bg-green-500/15 dark:text-green-300"
+                            >
+                              ✔ Resolve
+                            </button>
+                            <button
+                              type="button"
+                              x-show="t.status === 'Resolved'"
+                              @click="updateTicketStatus(t.id, 'Open')"
+                              class="rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                            >
+                              Reopen
+                            </button>
+                            <button
+                              type="button"
+                              @click="removeTicket(t.id)"
+                              class="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-100 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-400"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- ==================== SECTION 3: SUBMISSIONS ==================== -->
+            <div
+              x-show="activeTab === 'all' || activeTab === 'submissions'"
+              class="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3"
+            >
+              <div class="flex flex-col gap-3 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    💻 Recent Submissions
+                  </h2>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    View code submissions judged by the Docker Sandbox.
+                  </p>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto p-4 sm:p-6">
+                <table class="min-w-full">
+                  <thead class="border-b border-gray-100 dark:border-white/5">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">ID</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Discord User</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Problem</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Status</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Runtime</th>
+                      <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Submitted At</th>
+                      <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Code</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100 dark:divide-white/5">
+                    <template x-if="submissions.length === 0">
+                      <tr>
+                        <td colspan="7" class="px-4 py-8 text-center text-sm text-gray-400">
+                          No submissions yet.
+                        </td>
+                      </tr>
+                    </template>
+                    <template x-for="s in submissions" :key="s.id">
+                      <tr class="hover:bg-gray-50/60 dark:hover:bg-white/2">
+                        <td class="px-4 py-3.5 text-sm font-semibold text-gray-900 dark:text-white" x-text="`#${s.id}`"></td>
+                        <td class="px-4 py-3.5 text-sm text-gray-600 dark:text-gray-300" x-text="s.user_discord_id"></td>
+                        <td class="px-4 py-3.5 text-sm font-medium text-brand-500" x-text="`Problem #${s.problem_id}`"></td>
+                        <td class="px-4 py-3.5 text-sm">
+                          <span
+                            class="inline-flex rounded-lg px-2.5 py-0.5 text-xs font-medium"
+                            :class="{
+                              'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-400': s.status === 'Accepted' || s.status === 'ACCEPTED',
+                              'bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400': s.status === 'Pending' || s.status === 'Judging',
+                              'bg-red-50 text-red-600 dark:bg-red-500/15 dark:text-red-400': !['Accepted','ACCEPTED','Pending','Judging'].includes(s.status)
+                            }"
+                            x-text="s.status"
+                          ></span>
+                        </td>
+                        <td class="px-4 py-3.5 text-xs text-gray-500 dark:text-gray-400" x-text="s.runtime != null ? `${s.runtime}s` : '-'"></td>
+                        <td class="px-4 py-3.5 text-xs text-gray-500 dark:text-gray-400" x-text="formatDate(s.created_at)"></td>
+                        <td class="px-4 py-3.5 text-right text-sm">
+                          <button
+                            type="button"
+                            @click="openSubmissionDetail(s)"
+                            class="rounded-lg border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                          >
+                            👁️ View Code
+                          </button>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -135,5 +791,285 @@
       <!-- ===== Content Area End ===== -->
     </div>
     <!-- ===== Page Wrapper End ===== -->
+
+    <!-- ==================== MODAL 1: ADD / EDIT PROBLEM ==================== -->
+    <div
+      x-cloak
+      x-show="problemModalOpen"
+      class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-xs"
+    >
+      <div
+        @click.outside="problemModalOpen = false"
+        class="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xl dark:border-gray-800 dark:bg-gray-900"
+      >
+        <h3
+          class="text-lg font-bold text-gray-900 dark:text-white"
+          x-text="isEditingProblem ? `Edit Problem #${problemForm.id}` : 'Add New Problem'"
+        ></h3>
+        <form @submit.prevent="saveProblem()" class="mt-4 space-y-4">
+          <div>
+            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Title *</label>
+            <input
+              type="text"
+              required
+              x-model="problemForm.title"
+              placeholder="e.g. Sum of Two Numbers"
+              class="w-full rounded-xl border border-gray-300 bg-transparent px-3.5 py-2.5 text-sm text-gray-900 dark:border-gray-700 dark:text-white"
+            />
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Difficulty</label>
+              <select
+                x-model="problemForm.difficulty"
+                class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              >
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Time Limit (sec)</label>
+              <input
+                type="number"
+                step="0.1"
+                x-model="problemForm.time_limit"
+                class="w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2.5 text-sm text-gray-900 dark:border-gray-700 dark:text-white"
+              />
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Memory (MB)</label>
+              <input
+                type="number"
+                x-model="problemForm.memory_limit"
+                class="w-full rounded-xl border border-gray-300 bg-transparent px-3 py-2.5 text-sm text-gray-900 dark:border-gray-700 dark:text-white"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Description *</label>
+            <textarea
+              rows="5"
+              required
+              x-model="problemForm.description"
+              placeholder="Write problem description and examples..."
+              class="w-full rounded-xl border border-gray-300 bg-transparent p-3.5 text-sm text-gray-900 dark:border-gray-700 dark:text-white"
+            ></textarea>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              @click="problemModalOpen = false"
+              class="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="rounded-xl bg-brand-500 px-5 py-2 text-sm font-medium text-white hover:bg-brand-600"
+            >
+              💾 Save Problem
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==================== MODAL 2: TEST CASES ==================== -->
+    <div
+      x-cloak
+      x-show="testCaseModalOpen"
+      class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-xs"
+    >
+      <div
+        @click.outside="testCaseModalOpen = false"
+        class="w-full max-w-2xl rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xl dark:border-gray-800 dark:bg-gray-900"
+      >
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+          <h3
+            class="text-lg font-bold text-gray-900 dark:text-white"
+            x-text="selectedProblem ? `🧪 Test Cases — Problem #${selectedProblem.id}: ${selectedProblem.title}` : 'Test Cases'"
+          ></h3>
+          <button
+            type="button"
+            @click="testCaseModalOpen = false"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Existing Test Cases -->
+        <div class="mt-4 max-h-60 overflow-y-auto space-y-2">
+          <template x-if="testCases.length === 0">
+            <p class="py-4 text-center text-sm text-amber-600 dark:text-amber-400">
+              ⚠️ No test cases yet! Add at least 1 test case below so the Sandbox can judge submissions.
+            </p>
+          </template>
+          <template x-for="tc in testCases" :key="tc.id">
+            <div class="flex items-start justify-between gap-4 rounded-xl border border-gray-200 p-3 dark:border-gray-800">
+              <div class="grid flex-1 grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span class="font-semibold text-gray-500 dark:text-gray-400">Input (stdin):</span>
+                  <pre class="mt-1 rounded bg-gray-100 p-2 font-mono text-gray-800 dark:bg-gray-800 dark:text-gray-200" x-text="tc.input_data || '(empty)'"></pre>
+                </div>
+                <div>
+                  <span class="font-semibold text-gray-500 dark:text-gray-400">Expected Output (stdout):</span>
+                  <pre class="mt-1 rounded bg-gray-100 p-2 font-mono text-gray-800 dark:bg-gray-800 dark:text-gray-200" x-text="tc.expected_output"></pre>
+                </div>
+              </div>
+              <button
+                type="button"
+                @click="removeTestCase(tc.id)"
+                class="rounded-lg bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-100 dark:bg-red-500/15 dark:text-red-400"
+              >
+                Delete
+              </button>
+            </div>
+          </template>
+        </div>
+
+        <!-- Add New Test Case Form -->
+        <form @submit.prevent="addTestCase()" class="mt-4 border-t border-gray-100 pt-4 space-y-3 dark:border-gray-800">
+          <h4 class="text-sm font-semibold text-gray-800 dark:text-white">+ Add New Test Case</h4>
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label class="mb-1 block text-xs text-gray-500">Input Data (leave empty if none)</label>
+              <textarea
+                rows="3"
+                x-model="newTestCase.input_data"
+                placeholder="e.g. 5&#10;10"
+                class="w-full rounded-xl border border-gray-300 bg-transparent p-2.5 font-mono text-xs text-gray-900 dark:border-gray-700 dark:text-white"
+              ></textarea>
+            </div>
+            <div>
+              <label class="mb-1 block text-xs text-gray-500">Expected Output *</label>
+              <textarea
+                rows="3"
+                required
+                x-model="newTestCase.expected_output"
+                placeholder="e.g. 15"
+                class="w-full rounded-xl border border-gray-300 bg-transparent p-2.5 font-mono text-xs text-gray-900 dark:border-gray-700 dark:text-white"
+              ></textarea>
+            </div>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button
+              type="button"
+              @click="testCaseModalOpen = false"
+              class="rounded-xl border border-gray-300 px-4 py-2 text-xs font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
+            >
+              Close
+            </button>
+            <button
+              type="submit"
+              class="rounded-xl bg-brand-500 px-4 py-2 text-xs font-medium text-white hover:bg-brand-600"
+            >
+              + Add Test Case
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==================== MODAL 3: NEW IT TICKET ==================== -->
+    <div
+      x-cloak
+      x-show="ticketModalOpen"
+      class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-xs"
+    >
+      <div
+        @click.outside="ticketModalOpen = false"
+        class="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xl dark:border-gray-800 dark:bg-gray-900"
+      >
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white">🎫 Create New IT Ticket</h3>
+        <form @submit.prevent="createTicket()" class="mt-4 space-y-4">
+          <div>
+            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Discord User ID / Name</label>
+            <input
+              type="text"
+              required
+              x-model="ticketForm.user_discord_id"
+              class="w-full rounded-xl border border-gray-300 bg-transparent px-3.5 py-2 text-sm text-gray-900 dark:border-gray-700 dark:text-white"
+            />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-gray-700 dark:text-gray-300">Issue Description *</label>
+            <textarea
+              rows="4"
+              required
+              x-model="ticketForm.issue_description"
+              placeholder="Describe the issue..."
+              class="w-full rounded-xl border border-gray-300 bg-transparent p-3 text-sm text-gray-900 dark:border-gray-700 dark:text-white"
+            ></textarea>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button
+              type="button"
+              @click="ticketModalOpen = false"
+              class="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="rounded-xl bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
+            >
+              Submit Ticket
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ==================== MODAL 4: VIEW SUBMISSION CODE ==================== -->
+    <div
+      x-cloak
+      x-show="submissionModalOpen"
+      class="fixed inset-0 z-99999 flex items-center justify-center bg-gray-900/60 p-4 backdrop-blur-xs"
+    >
+      <div
+        @click.outside="submissionModalOpen = false"
+        class="w-full max-w-xl rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-xl dark:border-gray-800 dark:bg-gray-900"
+      >
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-800">
+          <h3
+            class="text-lg font-bold text-gray-900 dark:text-white"
+            x-text="selectedSubmission ? `Submission #${selectedSubmission.id}` : ''"
+          ></h3>
+          <button
+            type="button"
+            @click="submissionModalOpen = false"
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+        <template x-if="selectedSubmission">
+          <div class="mt-4 space-y-3 text-sm">
+            <div class="flex flex-wrap gap-4 text-xs text-gray-500 dark:text-gray-400">
+              <span>User: <b class="text-gray-800 dark:text-white" x-text="selectedSubmission.user_discord_id"></b></span>
+              <span>Problem: <b class="text-gray-800 dark:text-white" x-text="`#${selectedSubmission.problem_id}`"></b></span>
+              <span>Status: <b class="text-brand-500" x-text="selectedSubmission.status"></b></span>
+              <span>Runtime: <b class="text-gray-800 dark:text-white" x-text="selectedSubmission.runtime != null ? `${selectedSubmission.runtime}s` : '-'"></b></span>
+            </div>
+            <div>
+              <span class="text-xs font-semibold uppercase text-gray-400">Source Code:</span>
+              <pre class="mt-1 max-h-60 overflow-auto rounded-xl bg-gray-900 p-4 font-mono text-xs text-gray-100" x-text="selectedSubmission.source_code"></pre>
+            </div>
+            <template x-if="selectedSubmission.error_message">
+              <div>
+                <span class="text-xs font-semibold uppercase text-red-500">Error Output:</span>
+                <pre class="mt-1 max-h-40 overflow-auto rounded-xl bg-red-950/90 p-3 font-mono text-xs text-red-200" x-text="selectedSubmission.error_message"></pre>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+    </div>
   </body>
 </html>

@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 import asyncio
 load_dotenv()
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-# Khai báo 1 lần dùng mãi mãi
 API_URL = "http://127.0.0.1:8000/api"
 # KHỞI TẠO BOT
 intents = discord.Intents.default()

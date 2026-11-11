@@ -34,6 +34,10 @@ def submit_code(
     
     return new_submission
 
+@router.get("/", response_model=list[SubmissionResponse])
+def get_all_submissions(db: Session = Depends(get_db)):
+    return db.query(Submission).order_by(Submission.id.desc()).limit(50).all()
+
 @router.get("/{submission_id}", response_model=SubmissionResponse)
 def get_submission(submission_id: int, db: Session = Depends(get_db)):
     submission = db.query(Submission).filter(Submission.id == submission_id).first()
