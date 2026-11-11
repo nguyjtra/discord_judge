@@ -91,7 +91,7 @@
                 :class="sidebarToggle ? 'xl:hidden' : ''"
                 class="inline-flex items-center gap-1.5 font-mono text-xs tabular-nums text-[#6E6A61] dark:text-[#9B968B]"
               >
-                <span x-show="openTicketsCount > 0" class="h-1.5 w-1.5 rounded-full bg-[#9A6B2F] dark:bg-[#D4A362]"></span>
+                <span x-show="openTicketsCount > 0" class="status-dot-pulse h-1.5 w-1.5 rounded-full bg-[#A17034] dark:bg-[#D4A362]" style="--dot-glow: rgba(161, 112, 52, 0.45);"></span>
                 <span x-text="openTicketsCount">0</span>
               </span>
             </button>

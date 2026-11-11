@@ -47,8 +47,9 @@
               ivory: "#EAE6DD",
               ash: "#9B968B",
               sienna: "#B4532A",
-              forest: "#2E5A44",
-              ochre: "#9A6B2F",
+              emeraldInk: "#2E6F50",
+              sageInk: "#6E8B74",
+              ochre: "#A17034",
               steel: "#3B5B75",
               burgundy: "#8B2635",
             },
@@ -57,20 +58,246 @@
       };
     </script>
     <style>
+      :root {
+        --shadow-ambient:
+          0 1px 2px rgba(28, 27, 24, 0.03),
+          0 4px 10px rgba(28, 27, 24, 0.035),
+          0 12px 24px -4px rgba(28, 27, 24, 0.045),
+          0 24px 44px -12px rgba(28, 27, 24, 0.06);
+        --shadow-lifted:
+          0 2px 4px rgba(28, 27, 24, 0.045),
+          0 10px 20px rgba(28, 27, 24, 0.055),
+          0 22px 40px -6px rgba(28, 27, 24, 0.075),
+          0 40px 68px -16px rgba(28, 27, 24, 0.11);
+        --shadow-row-float:
+          0 1px 2px rgba(28, 27, 24, 0.025),
+          0 4px 12px -2px rgba(28, 27, 24, 0.04),
+          0 12px 28px -8px rgba(28, 27, 24, 0.055);
+      }
+
+      html.dark {
+        --shadow-ambient:
+          0 1px 2px rgba(0, 0, 0, 0.24),
+          0 6px 14px rgba(0, 0, 0, 0.28),
+          0 14px 28px -4px rgba(0, 0, 0, 0.34),
+          0 28px 48px -12px rgba(0, 0, 0, 0.42);
+        --shadow-lifted:
+          0 2px 6px rgba(0, 0, 0, 0.3),
+          0 12px 24px rgba(0, 0, 0, 0.38),
+          0 24px 44px -6px rgba(0, 0, 0, 0.46),
+          0 44px 72px -16px rgba(0, 0, 0, 0.58);
+        --shadow-row-float:
+          0 2px 6px rgba(0, 0, 0, 0.22),
+          0 8px 20px -4px rgba(0, 0, 0, 0.34),
+          0 18px 36px -10px rgba(0, 0, 0, 0.42);
+      }
+
       [x-cloak] {
         display: none !important;
       }
+
       body {
         font-family: "Plus Jakarta Sans", system-ui, sans-serif;
         background-color: #f6f4ef;
         color: #1c1b18;
         -webkit-font-smoothing: antialiased;
       }
+
       html.dark body,
       body.dark {
         background-color: #141413;
         color: #eae6dd;
       }
+
+      /* Tactile 3D Spatial Panels */
+      .spatial-card {
+        position: relative;
+        transform-style: preserve-3d;
+        will-change: transform, box-shadow;
+        box-shadow: var(--shadow-ambient);
+        transition:
+          transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+          box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+          border-color 0.3s ease;
+      }
+
+      .spatial-card.is-tilting {
+        transition:
+          transform 0.08s linear,
+          box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+          border-color 0.25s ease;
+        box-shadow: var(--shadow-lifted);
+      }
+
+      .preserve-3d {
+        transform-style: preserve-3d;
+      }
+
+      .depth-layer-1 {
+        transform: translateZ(16px);
+        transform-style: preserve-3d;
+      }
+
+      .depth-layer-2 {
+        transform: translateZ(30px);
+        transform-style: preserve-3d;
+      }
+
+      /* Mouse-tracking Radial Spotlight (no overflow:hidden on spatial-card so preserve-3d stays intact) */
+      .spotlight-surface {
+        position: relative;
+      }
+
+      .spotlight-surface::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        transform: translateZ(1px);
+        transition: opacity 0.35s ease;
+        background: radial-gradient(
+          420px circle at var(--mx, 50%) var(--my, 50%),
+          rgba(180, 83, 42, 0.12),
+          rgba(161, 112, 52, 0.05) 45%,
+          transparent 72%
+        );
+      }
+
+      html.dark .spotlight-surface::before {
+        background: radial-gradient(
+          420px circle at var(--mx, 50%) var(--my, 50%),
+          rgba(234, 230, 221, 0.13),
+          rgba(212, 163, 98, 0.05) 45%,
+          transparent 72%
+        );
+      }
+
+      .spotlight-surface:hover::before {
+        opacity: 1;
+      }
+
+      /* Button Mouse-tracking Spotlight */
+      .btn-spotlight {
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+          border-color 0.25s ease,
+          background-color 0.25s ease,
+          color 0.25s ease,
+          box-shadow 0.3s ease;
+      }
+
+      .btn-spotlight::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+        background: radial-gradient(
+          140px circle at var(--mx, 50%) var(--my, 50%),
+          rgba(180, 83, 42, 0.14),
+          transparent 70%
+        );
+      }
+
+      .btn-spotlight-dark::before {
+        background: radial-gradient(
+          150px circle at var(--mx, 50%) var(--my, 50%),
+          rgba(255, 255, 255, 0.15),
+          transparent 70%
+        );
+      }
+
+      html.dark .btn-spotlight::before {
+        background: radial-gradient(
+          140px circle at var(--mx, 50%) var(--my, 50%),
+          rgba(234, 230, 221, 0.14),
+          transparent 70%
+        );
+      }
+
+      html.dark .btn-spotlight-dark::before {
+        background: radial-gradient(
+          150px circle at var(--mx, 50%) var(--my, 50%),
+          rgba(28, 27, 24, 0.14),
+          transparent 70%
+        );
+      }
+
+      .btn-spotlight:hover::before {
+        opacity: 1;
+      }
+
+      /* Sliding Floating Highlight Background for Tables */
+      .floating-highlight {
+        background-color: rgba(239, 236, 228, 0.85);
+        box-shadow: var(--shadow-row-float);
+        border-radius: 6px;
+        will-change: transform, height, opacity;
+        transition:
+          transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+          height 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.18s ease;
+      }
+
+      html.dark .floating-highlight {
+        background-color: rgba(31, 30, 27, 0.92);
+      }
+
+      /* Interactive 3D Table Row Elevation */
+      .tilt-row {
+        transform-style: preserve-3d;
+        will-change: transform;
+        transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .tilt-row td {
+        transform-style: preserve-3d;
+      }
+
+      .tilt-row.is-tilting {
+        transition: transform 0.08s linear;
+      }
+
+      .tilt-row .depth-cell {
+        transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+        transform: translateZ(0);
+      }
+
+      .tilt-row:hover .depth-cell {
+        transform: translateZ(20px);
+      }
+
+      .tilt-row .depth-cell-deep {
+        transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+        transform: translateZ(0);
+      }
+
+      .tilt-row:hover .depth-cell-deep {
+        transform: translateZ(28px);
+      }
+
+      /* Soft Breathing Pulse Status Dot */
+      @keyframes statusPulse {
+        0%,
+        100% {
+          opacity: 1;
+          box-shadow: 0 0 0 0 var(--dot-glow, rgba(46, 111, 80, 0.35));
+        }
+        50% {
+          opacity: 0.72;
+          box-shadow: 0 0 0 5px rgba(0, 0, 0, 0);
+        }
+      }
+
+      .status-dot-pulse {
+        animation: statusPulse 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+
+      /* Sidebar nav states */
       .menu-item {
         position: relative;
         display: flex;
@@ -82,57 +309,84 @@
         border-left: 2px solid transparent;
         transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
       }
+
       .menu-item-active {
         border-left-color: #1c1b18;
         background-color: #e9e4d9;
         color: #1c1b18;
       }
+
       html.dark .menu-item-active,
       .dark .menu-item-active {
         border-left-color: #eae6dd;
         background-color: #23221e;
         color: #eae6dd;
       }
+
       .menu-item-inactive {
         color: #6e6a61;
       }
+
       .menu-item-inactive:hover {
         background-color: rgba(28, 27, 24, 0.04);
         color: #1c1b18;
       }
+
       html.dark .menu-item-inactive,
       .dark .menu-item-inactive {
         color: #9b968b;
       }
+
       html.dark .menu-item-inactive:hover,
       .dark .menu-item-inactive:hover {
         background-color: rgba(234, 230, 221, 0.05);
         color: #eae6dd;
       }
+
       .no-scrollbar::-webkit-scrollbar {
         display: none;
       }
+
       .no-scrollbar {
         -ms-overflow-style: none;
         scrollbar-width: none;
       }
+
       .w-68 {
         width: 16.5rem;
       }
+
       .z-99 {
         z-index: 99;
       }
+
       .z-9999 {
         z-index: 9999;
       }
+
       .z-99999 {
         z-index: 99999;
       }
+
       .z-999999 {
         z-index: 999999;
       }
+
       .backdrop-blur-xs {
         backdrop-filter: blur(4px);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .spatial-card,
+        .tilt-row,
+        .floating-highlight,
+        .status-dot-pulse,
+        .tilt-row .depth-cell,
+        .tilt-row .depth-cell-deep {
+          animation: none !important;
+          transition: none !important;
+          transform: none !important;
+        }
       }
     </style>
     <script type="importmap">
@@ -154,32 +408,42 @@
       window.Alpine = Alpine;
 
       const TONE_MAP = {
-        forest: {
-          dot: "bg-[#2E5A44] dark:bg-[#7CA98E]",
-          bar: "bg-[#2E5A44] dark:bg-[#7CA98E]",
-          text: "text-[#2E5A44] dark:text-[#7CA98E]",
+        emerald: {
+          dot: "bg-[#2E6F50] dark:bg-[#6EB38E]",
+          glow: "rgba(46, 111, 80, 0.45)",
+          bar: "bg-[#2E6F50] dark:bg-[#6EB38E]",
+          text: "text-[#2E6F50] dark:text-[#6EB38E]",
+        },
+        sage: {
+          dot: "bg-[#6E8B74] dark:bg-[#8FA995]",
+          glow: "rgba(110, 139, 116, 0.45)",
+          bar: "bg-[#6E8B74] dark:bg-[#8FA995]",
+          text: "text-[#58745E] dark:text-[#9BB5A1]",
         },
         ochre: {
-          dot: "bg-[#9A6B2F] dark:bg-[#D4A362]",
-          bar: "bg-[#9A6B2F] dark:bg-[#D4A362]",
-          text: "text-[#9A6B2F] dark:text-[#D4A362]",
+          dot: "bg-[#A17034] dark:bg-[#D4A362]",
+          glow: "rgba(161, 112, 52, 0.42)",
+          bar: "bg-[#A17034] dark:bg-[#D4A362]",
+          text: "text-[#8A5D27] dark:text-[#D4A362]",
         },
         steel: {
           dot: "bg-[#3B5B75] dark:bg-[#84A8C4]",
+          glow: "rgba(59, 91, 117, 0.42)",
           bar: "bg-[#3B5B75] dark:bg-[#84A8C4]",
           text: "text-[#3B5B75] dark:text-[#84A8C4]",
         },
         burgundy: {
           dot: "bg-[#8B2635] dark:bg-[#D47A86]",
+          glow: "rgba(139, 38, 53, 0.45)",
           bar: "bg-[#8B2635] dark:bg-[#D47A86]",
           text: "text-[#8B2635] dark:text-[#D47A86]",
         },
       };
 
       const STATUS_TONE_LOOKUP = {
-        accepted: "forest",
-        resolved: "forest",
-        easy: "forest",
+        accepted: "emerald",
+        resolved: "emerald",
+        easy: "sage",
         pending: "ochre",
         judging: "ochre",
         open: "ochre",
@@ -192,6 +456,103 @@
         hard: "burgundy",
       };
 
+      const prefersReducedMotion = () =>
+        window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+
+      /**
+       * 60fps requestAnimationFrame pointer tracker for 3D tilt + spotlight CSS vars.
+       */
+      Alpine.directive("spatial", (el, { expression }, { evaluate }) => {
+        const opts = expression ? evaluate(expression) : {};
+        const maxTilt = opts.tilt ?? 4.2;
+        const perspective = opts.perspective ?? 920;
+        const liftScale = opts.scale ?? 1.008;
+        const enableTilt = opts.enableTilt !== false;
+
+        let rafId = null;
+        let lastEvent = null;
+
+        const applyFrame = () => {
+          rafId = null;
+          if (!lastEvent || prefersReducedMotion()) return;
+          const rect = el.getBoundingClientRect();
+          if (!rect.width || !rect.height) return;
+
+          const x = lastEvent.clientX - rect.left;
+          const y = lastEvent.clientY - rect.top;
+          el.style.setProperty("--mx", `${x.toFixed(1)}px`);
+          el.style.setProperty("--my", `${y.toFixed(1)}px`);
+
+          if (enableTilt) {
+            const nx = x / rect.width - 0.5;
+            const ny = y / rect.height - 0.5;
+            const rx = (-ny * 2 * maxTilt).toFixed(2);
+            const ry = (nx * 2 * maxTilt).toFixed(2);
+            el.style.transform = `perspective(${perspective}px) rotateX(${rx}deg) rotateY(${ry}deg) scale3d(${liftScale}, ${liftScale}, 1)`;
+          }
+        };
+
+        const onMove = (e) => {
+          lastEvent = e;
+          el.classList.add("is-tilting");
+          if (rafId === null) {
+            rafId = requestAnimationFrame(applyFrame);
+          }
+        };
+
+        const onLeave = () => {
+          lastEvent = null;
+          if (rafId !== null) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+          el.classList.remove("is-tilting");
+          if (enableTilt) {
+            el.style.transform = `perspective(${perspective}px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+          }
+        };
+
+        el.addEventListener("pointermove", onMove, { passive: true });
+        el.addEventListener("pointerleave", onLeave, { passive: true });
+      });
+
+      /**
+       * Reusable sliding floating row highlight controller (Framer Motion layoutId feel at 60fps).
+       */
+      Alpine.data("floatingTable", () => ({
+        y: 0,
+        h: 0,
+        active: false,
+        tone: "sage",
+        _raf: null,
+
+        move(rowEl, rowTone = "sage") {
+          if (!rowEl || !this.$refs.stage) return;
+          if (this._raf) cancelAnimationFrame(this._raf);
+          this._raf = requestAnimationFrame(() => {
+            const stageRect = this.$refs.stage.getBoundingClientRect();
+            const rowRect = rowEl.getBoundingClientRect();
+            this.y = Math.round(rowRect.top - stageRect.top);
+            this.h = Math.round(rowRect.height);
+            this.tone = rowTone;
+            this.active = true;
+            this._raf = null;
+          });
+        },
+
+        clear() {
+          if (this._raf) {
+            cancelAnimationFrame(this._raf);
+            this._raf = null;
+          }
+          this.active = false;
+        },
+
+        barClass(tone) {
+          return (TONE_MAP[STATUS_TONE_LOOKUP[String(tone || "").toLowerCase()] || "sage"] || TONE_MAP.sage).bar;
+        },
+      }));
+
       Alpine.data("adminApp", () => ({
         page: "adminDashboard",
         loaded: false,
@@ -200,6 +561,7 @@
         sidebarToggle: false,
         scrollTop: false,
         activeTab: "all",
+        isSyncing: false,
 
         problems: [],
         tickets: [],
@@ -246,7 +608,7 @@
             document.documentElement.classList.toggle("dark", value);
             localStorage.setItem("darkMode", JSON.stringify(value));
           });
-          this.fetchAllData();
+          this.fetchAllData({ animate: true });
         },
 
         showToast(msg) {
@@ -256,12 +618,50 @@
           }, 3000);
         },
 
-        async fetchAllData() {
+        runStaggeredWaterfall() {
+          if (prefersReducedMotion()) return;
+          this.$nextTick(() => {
+            const tbodies = document.querySelectorAll("tbody[data-stagger-group]");
+            tbodies.forEach((tbody) => {
+              const rows = tbody.querySelectorAll(":scope > tr.stagger-row");
+              rows.forEach((row, index) => {
+                row.animate(
+                  [
+                    { opacity: 0, transform: "translate3d(0, 10px, 0)" },
+                    { opacity: 1, transform: "translate3d(0, 0, 0)" },
+                  ],
+                  {
+                    duration: 420,
+                    delay: index * 50,
+                    easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+                    fill: "backwards",
+                  }
+                );
+              });
+            });
+          });
+        },
+
+        async fetchAllData({ animate = false, notify = false } = {}) {
+          if (animate) this.isSyncing = true;
+          const minDelay = animate
+            ? new Promise((resolve) => setTimeout(resolve, 140))
+            : Promise.resolve();
+
           await Promise.all([
             this.fetchProblems(),
             this.fetchTickets(),
             this.fetchSubmissions(),
+            minDelay,
           ]);
+
+          if (animate) {
+            this.isSyncing = false;
+            this.runStaggeredWaterfall();
+          }
+          if (notify) {
+            this.showToast("Data synced");
+          }
         },
 
         async fetchProblems() {
@@ -356,8 +756,8 @@
           return this.getTone(value).dot;
         },
 
-        rowAccentClass(value) {
-          return this.getTone(value).bar;
+        statusDotStyle(value) {
+          return `--dot-glow: ${this.getTone(value).glow};`;
         },
 
         statusTextClass(value) {
@@ -598,8 +998,9 @@
       x-show="toastMessage"
       x-transition.opacity
       class="fixed right-6 bottom-6 z-999999 flex items-center gap-2.5 border border-[#2C2B27] bg-[#1C1B18] px-4 py-2.5 font-mono text-xs tracking-wide text-[#F6F4EF] dark:border-[#EAE6DD]/20 dark:bg-[#EAE6DD] dark:text-[#141413]"
+      style="box-shadow: var(--shadow-lifted)"
     >
-      <span class="h-1.5 w-1.5 rounded-full bg-[#7CA98E] dark:bg-[#2E5A44]"></span>
+      <span class="status-dot-pulse h-1.5 w-1.5 rounded-full bg-[#6EB38E] dark:bg-[#2E6F50]"></span>
       <span x-text="toastMessage"></span>
     </div>
 
@@ -632,51 +1033,70 @@
               <div class="flex flex-wrap items-center gap-3">
                 <button
                   type="button"
-                  @click="fetchAllData(); showToast('Data synced')"
-                  class="inline-flex items-center gap-2 border border-[#D7D1C5] bg-transparent px-4 py-2 text-xs font-medium tracking-wide text-[#6E6A61] transition-colors hover:border-[#1C1B18] hover:text-[#1C1B18] dark:border-[#2C2B27] dark:text-[#9B968B] dark:hover:border-[#EAE6DD] dark:hover:text-[#EAE6DD]"
+                  x-spatial="{ enableTilt: false }"
+                  @click="fetchAllData({ animate: true, notify: true })"
+                  class="btn-spotlight inline-flex items-center gap-2 border border-[#D7D1C5] bg-[#FBF9F5]/80 px-4 py-2 text-xs font-medium tracking-wide text-[#6E6A61] hover:border-[#1C1B18] hover:text-[#1C1B18] active:scale-[0.98] dark:border-[#2C2B27] dark:bg-[#1B1B19] dark:text-[#9B968B] dark:hover:border-[#EAE6DD] dark:hover:text-[#EAE6DD]"
                 >
-                  Sync
+                  <svg
+                    class="h-3.5 w-3.5 transition-transform duration-500"
+                    :class="isSyncing ? 'animate-spin' : ''"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="1.6"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span x-text="isSyncing ? 'Syncing...' : 'Sync'">Sync</span>
                 </button>
                 <button
                   type="button"
+                  x-spatial="{ enableTilt: false }"
                   @click="ticketModalOpen = true"
-                  class="inline-flex items-center gap-2 border border-[#D7D1C5] bg-[#EFECE4]/60 px-4 py-2 text-xs font-medium tracking-wide text-[#1C1B18] transition-colors hover:border-[#1C1B18] hover:bg-[#EFECE4] dark:border-[#2C2B27] dark:bg-[#1B1B19] dark:text-[#EAE6DD] dark:hover:border-[#EAE6DD]"
+                  class="btn-spotlight inline-flex items-center gap-2 border border-[#D7D1C5] bg-[#EFECE4]/70 px-4 py-2 text-xs font-medium tracking-wide text-[#1C1B18] hover:border-[#1C1B18] hover:bg-[#EFECE4] active:scale-[0.98] dark:border-[#2C2B27] dark:bg-[#1B1B19] dark:text-[#EAE6DD] dark:hover:border-[#EAE6DD]"
                 >
                   + Log Ticket
                 </button>
                 <button
                   type="button"
+                  x-spatial="{ enableTilt: false }"
                   @click="openCreateProblem()"
-                  class="inline-flex items-center gap-2 border border-[#1C1B18] bg-[#1C1B18] px-5 py-2 text-xs font-medium tracking-wide text-[#F6F4EF] transition-colors hover:bg-[#33312C] dark:border-[#EAE6DD] dark:bg-[#EAE6DD] dark:text-[#141413] dark:hover:bg-white"
+                  class="btn-spotlight btn-spotlight-dark inline-flex items-center gap-2 border border-[#1C1B18] bg-[#1C1B18] px-5 py-2 text-xs font-medium tracking-wide text-[#F6F4EF] hover:bg-[#2E2C27] active:scale-[0.98] dark:border-[#EAE6DD] dark:bg-[#EAE6DD] dark:text-[#141413] dark:hover:bg-white"
                 >
                   + New Problem
                 </button>
               </div>
             </section>
 
-            <!-- ==================== 1. ASYMMETRIC EDITORIAL METRICS ==================== -->
+            <!-- ==================== 1. ASYMMETRIC TACTILE 3D METRICS GRID ==================== -->
             <section
               aria-label="Key telemetry"
-              class="grid grid-cols-1 border-y border-[#E2DDD3] lg:grid-cols-12 dark:border-[#2C2B27]"
+              class="grid grid-cols-1 gap-5 lg:grid-cols-12"
             >
-              <!-- Hero Metric: Takes 6 of 12 columns cleanly on the left -->
-              <div class="flex flex-col justify-between py-8 pr-6 lg:col-span-6 lg:py-10 lg:pr-12">
-                <div class="flex items-center justify-between">
+              <!-- Hero Metric Panel: 6 of 12 cols with full 3D parallax tilt & radial spotlight -->
+              <div
+                x-spatial="{ tilt: 3.8, perspective: 1000, scale: 1.01 }"
+                class="spatial-card spotlight-surface flex flex-col justify-between border border-[#E2DDD3] bg-[#FBF9F5] p-8 lg:col-span-6 lg:p-10 dark:border-[#2C2B27] dark:bg-[#1B1B19]"
+              >
+                <div class="depth-layer-1 relative z-10 flex items-center justify-between">
                   <span class="font-mono text-[11px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
                     01 · Accepted Verdicts
                   </span>
-                  <span class="inline-flex items-center gap-2 font-mono text-[11px] text-[#2E5A44] dark:text-[#7CA98E]">
-                    <span class="h-1.5 w-1.5 rounded-full bg-[#2E5A44] dark:bg-[#7CA98E]"></span>
+                  <span class="inline-flex items-center gap-2 font-mono text-[11px] text-[#2E6F50] dark:text-[#6EB38E]">
+                    <span
+                      class="status-dot-pulse h-1.5 w-1.5 rounded-full bg-[#2E6F50] dark:bg-[#6EB38E]"
+                      style="--dot-glow: rgba(46, 111, 80, 0.45);"
+                    ></span>
                     Passed Sandbox
                   </span>
                 </div>
 
-                <div class="mt-8 flex flex-wrap items-baseline gap-6">
+                <div class="preserve-3d relative z-10 mt-10 flex flex-wrap items-baseline gap-6">
                   <span
-                    class="font-serif text-6xl leading-none font-normal tracking-tight tabular-nums text-[#1C1B18] sm:text-7xl lg:text-[5.25rem] dark:text-[#EAE6DD]"
+                    class="depth-layer-2 inline-block font-serif text-6xl leading-none font-normal tracking-tight tabular-nums text-[#1C1B18] sm:text-7xl lg:text-[5.5rem] dark:text-[#EAE6DD]"
                     x-text="acceptedSubmissionsCount"
                   >0</span>
-                  <div class="space-y-1 pb-1">
+                  <div class="depth-layer-1 space-y-1 pb-1">
                     <p class="text-sm font-medium text-[#1C1B18] dark:text-[#EAE6DD]">
                       Verified solutions
                     </p>
@@ -688,57 +1108,73 @@
                 </div>
               </div>
 
-              <!-- Right Half: Stacked Asymmetrically (7/5 upper split over 12-col lower strip) -->
-              <div class="flex flex-col border-t border-[#E2DDD3] lg:col-span-6 lg:border-t-0 lg:border-l dark:border-[#2C2B27]">
-                <div class="grid grid-cols-1 border-b border-[#E2DDD3] sm:grid-cols-12 dark:border-[#2C2B27]">
+              <!-- Right Half: Stacked Asymmetrically (7/5 upper tactile plates over 12-col lower strip) -->
+              <div class="flex flex-col gap-5 lg:col-span-6">
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-12">
                   <!-- Open IT Tickets (7 cols) -->
-                  <div class="flex flex-col justify-between py-7 sm:col-span-7 sm:px-8 lg:py-8">
-                    <div class="flex items-center justify-between">
+                  <div
+                    x-spatial="{ tilt: 4.5, perspective: 850, scale: 1.012 }"
+                    class="spatial-card spotlight-surface flex flex-col justify-between border border-[#E2DDD3] bg-[#FBF9F5] p-7 sm:col-span-7 dark:border-[#2C2B27] dark:bg-[#1B1B19]"
+                  >
+                    <div class="depth-layer-1 relative z-10 flex items-center justify-between">
                       <span class="font-mono text-[11px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
                         02 · Open Tickets
                       </span>
                       <span
-                        class="h-1.5 w-1.5 rounded-full"
-                        :class="openTicketsCount > 0 ? 'bg-[#9A6B2F] dark:bg-[#D4A362]' : 'bg-[#2E5A44] dark:bg-[#7CA98E]'"
+                        class="status-dot-pulse h-1.5 w-1.5 rounded-full"
+                        :class="openTicketsCount > 0 ? 'bg-[#A17034] dark:bg-[#D4A362]' : 'bg-[#2E6F50] dark:bg-[#6EB38E]'"
+                        :style="openTicketsCount > 0 ? '--dot-glow: rgba(161, 112, 52, 0.45);' : '--dot-glow: rgba(46, 111, 80, 0.45);'"
                       ></span>
                     </div>
-                    <div class="mt-5 flex items-baseline justify-between gap-4">
+                    <div class="preserve-3d relative z-10 mt-6 flex items-baseline justify-between gap-4">
                       <span
-                        class="font-serif text-5xl leading-none font-normal tabular-nums text-[#1C1B18] sm:text-6xl dark:text-[#EAE6DD]"
+                        class="depth-layer-2 inline-block font-serif text-5xl leading-none font-normal tabular-nums text-[#1C1B18] sm:text-6xl dark:text-[#EAE6DD]"
                         x-text="openTicketsCount"
                       >0</span>
                       <span
-                        class="font-mono text-xs text-[#6E6A61] dark:text-[#9B968B]"
+                        class="depth-layer-1 font-mono text-xs text-[#6E6A61] dark:text-[#9B968B]"
                         x-text="`${tickets.length} logged total`"
                       ></span>
                     </div>
                   </div>
 
                   <!-- Active Problems (5 cols) -->
-                  <div class="flex flex-col justify-between border-t border-[#E2DDD3] py-7 sm:col-span-5 sm:border-t-0 sm:border-l sm:pl-8 lg:py-8 dark:border-[#2C2B27]">
-                    <span class="font-mono text-[11px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
-                      03 · Problems
-                    </span>
-                    <div class="mt-5 flex items-baseline justify-between gap-3">
+                  <div
+                    x-spatial="{ tilt: 5.0, perspective: 800, scale: 1.014 }"
+                    class="spatial-card spotlight-surface flex flex-col justify-between border border-[#E2DDD3] bg-[#FBF9F5] p-7 sm:col-span-5 dark:border-[#2C2B27] dark:bg-[#1B1B19]"
+                  >
+                    <div class="depth-layer-1 relative z-10 flex items-center justify-between">
+                      <span class="font-mono text-[11px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
+                        03 · Problems
+                      </span>
                       <span
-                        class="font-serif text-5xl leading-none font-normal tabular-nums text-[#1C1B18] sm:text-6xl dark:text-[#EAE6DD]"
+                        class="status-dot-pulse h-1.5 w-1.5 rounded-full bg-[#6E8B74] dark:bg-[#8FA995]"
+                        style="--dot-glow: rgba(110, 139, 116, 0.45);"
+                      ></span>
+                    </div>
+                    <div class="preserve-3d relative z-10 mt-6 flex items-baseline justify-between gap-3">
+                      <span
+                        class="depth-layer-2 inline-block font-serif text-5xl leading-none font-normal tabular-nums text-[#1C1B18] sm:text-6xl dark:text-[#EAE6DD]"
                         x-text="problems.length"
                       >0</span>
-                      <span class="font-mono text-xs text-[#6E6A61] dark:text-[#9B968B]">
-                        Active
+                      <span class="depth-layer-1 font-mono text-xs text-[#58745E] dark:text-[#9BB5A1]">
+                        Curated
                       </span>
                     </div>
                   </div>
                 </div>
 
                 <!-- Lower Strip: Total Submissions -->
-                <div class="flex flex-wrap items-center justify-between gap-4 py-6 sm:px-8">
-                  <div class="flex items-baseline gap-4">
+                <div
+                  x-spatial="{ tilt: 3.2, perspective: 950, scale: 1.008 }"
+                  class="spatial-card spotlight-surface flex flex-wrap items-center justify-between gap-4 border border-[#E2DDD3] bg-[#FBF9F5] px-7 py-6 dark:border-[#2C2B27] dark:bg-[#1B1B19]"
+                >
+                  <div class="preserve-3d relative z-10 flex items-baseline gap-5">
                     <span
-                      class="font-serif text-4xl leading-none font-normal tabular-nums text-[#1C1B18] dark:text-[#EAE6DD]"
+                      class="depth-layer-2 inline-block font-serif text-4xl leading-none font-normal tabular-nums text-[#1C1B18] sm:text-5xl dark:text-[#EAE6DD]"
                       x-text="submissions.length"
                     >0</span>
-                    <div>
+                    <div class="depth-layer-1">
                       <span class="block text-xs font-medium text-[#1C1B18] dark:text-[#EAE6DD]">
                         Total Sandbox Runs
                       </span>
@@ -751,7 +1187,7 @@
                     type="button"
                     @click="activeTab = 'submissions'"
                     x-show="activeTab !== 'submissions'"
-                    class="border-b border-[#1C1B18]/40 pb-0.5 font-mono text-[11px] tracking-wider text-[#1C1B18] uppercase transition-colors hover:border-[#1C1B18] dark:border-[#EAE6DD]/40 dark:text-[#EAE6DD] dark:hover:border-[#EAE6DD]"
+                    class="depth-layer-1 relative z-10 border-b border-[#1C1B18]/40 pb-0.5 font-mono text-[11px] tracking-wider text-[#1C1B18] uppercase transition-colors hover:border-[#1C1B18] dark:border-[#EAE6DD]/40 dark:text-[#EAE6DD] dark:hover:border-[#EAE6DD]"
                   >
                     Inspect Queue →
                   </button>
@@ -788,80 +1224,108 @@
                 </div>
               </div>
 
-              <div class="overflow-x-auto">
-                <table class="min-w-full border-collapse">
-                  <thead>
-                    <tr class="border-b border-[#E2DDD3] dark:border-[#2C2B27]">
-                      <th class="py-3.5 pr-4 pl-4 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">No.</th>
-                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Title</th>
-                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Prompt Summary</th>
-                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Difficulty</th>
-                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Limits</th>
-                      <th class="py-3.5 pr-3 pl-4 text-right font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Manage</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-[#E2DDD3]/75 dark:divide-[#2C2B27]/80">
-                    <template x-if="filteredProblems.length === 0">
+              <div class="overflow-x-auto px-1 pb-4">
+                <div
+                  x-ref="stage"
+                  x-data="floatingTable()"
+                  @mouseleave="clear()"
+                  class="table-stage relative min-w-full"
+                >
+                  <!-- Floating sliding highlight sheet -->
+                  <div
+                    aria-hidden="true"
+                    class="floating-highlight pointer-events-none absolute top-0 right-0 left-0 z-0"
+                    :class="active ? 'opacity-100' : 'opacity-0'"
+                    :style="`transform: translate3d(0, ${y}px, 0); height: ${h}px;`"
+                  >
+                    <span
+                      class="absolute top-2.5 bottom-2.5 left-0 w-[2px] transition-colors duration-300"
+                      :class="barClass(tone)"
+                    ></span>
+                  </div>
+
+                  <table class="relative z-10 min-w-full border-separate border-spacing-0">
+                    <thead>
                       <tr>
-                        <td colspan="6" class="px-4 py-14 text-center text-sm text-[#6E6A61] dark:text-[#9B968B]">
-                          No coding problems match your filter. Select <span class="underline cursor-pointer" @click="openCreateProblem()">New Problem</span> to draft one.
-                        </td>
+                        <th class="border-b border-[#E2DDD3] py-3.5 pr-4 pl-5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">No.</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Title</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Prompt Summary</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Difficulty</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Limits</th>
+                        <th class="border-b border-[#E2DDD3] py-3.5 pr-4 pl-4 text-right font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Manage</th>
                       </tr>
-                    </template>
-                    <template x-for="p in filteredProblems" :key="p.id">
-                      <tr class="group transition-colors duration-150 hover:bg-[#EFECE4]/60 dark:hover:bg-[#1B1B19]">
-                        <td class="relative py-5 pr-4 pl-4 font-mono text-xs text-[#6E6A61] tabular-nums dark:text-[#9B968B]">
-                          <span
-                            class="absolute top-3.5 bottom-3.5 left-0 w-[2px] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-                            :class="rowAccentClass(p.difficulty || 'Easy')"
-                          ></span>
-                          <span x-text="`#${String(p.id).padStart(2, '0')}`"></span>
-                        </td>
-                        <td class="px-4 py-5 text-sm font-medium text-[#1C1B18] dark:text-[#EAE6DD]" x-text="p.title"></td>
-                        <td class="max-w-md px-4 py-5 text-sm leading-relaxed text-[#6E6A61] dark:text-[#9B968B]">
-                          <p class="line-clamp-2" x-text="p.description"></p>
-                        </td>
-                        <td class="px-4 py-5 text-sm">
-                          <span class="inline-flex items-center gap-2 text-xs font-medium text-[#1C1B18] dark:text-[#EAE6DD]">
-                            <span
-                              class="h-1.5 w-1.5 rounded-full"
-                              :class="statusDotClass(p.difficulty || 'Easy')"
-                            ></span>
-                            <span x-text="p.difficulty || 'Easy'"></span>
-                          </span>
-                        </td>
-                        <td class="px-4 py-5 font-mono text-xs text-[#6E6A61] tabular-nums dark:text-[#9B968B]">
-                          <span x-text="`${p.time_limit || 1.0}s · ${p.memory_limit || 256}MB`"></span>
-                        </td>
-                        <td class="py-5 pr-3 pl-4 text-right text-xs whitespace-nowrap">
-                          <div class="inline-flex items-center gap-4 opacity-55 transition-opacity duration-200 group-hover:opacity-100 max-sm:opacity-100">
-                            <button
-                              type="button"
-                              @click="openTestCasesModal(p)"
-                              class="font-medium text-[#1C1B18] underline decoration-[#1C1B18]/30 underline-offset-4 hover:decoration-[#1C1B18] dark:text-[#EAE6DD] dark:decoration-[#EAE6DD]/30 dark:hover:decoration-[#EAE6DD]"
-                            >
-                              Test Cases
-                            </button>
-                            <button
-                              type="button"
-                              @click="openEditProblem(p)"
-                              class="font-medium text-[#6E6A61] hover:text-[#1C1B18] dark:text-[#9B968B] dark:hover:text-[#EAE6DD]"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              @click="deleteProblem(p.id)"
-                              class="font-medium text-[#8B2635]/80 hover:text-[#8B2635] dark:text-[#D47A86]/80 dark:hover:text-[#D47A86]"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    </template>
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody
+                      data-stagger-group="problems"
+                      :class="isSyncing ? 'opacity-0' : 'opacity-100'"
+                    >
+                      <template x-if="filteredProblems.length === 0">
+                        <tr>
+                          <td colspan="6" class="px-4 py-14 text-center text-sm text-[#6E6A61] dark:text-[#9B968B]">
+                            No coding problems match your filter. Select <span class="underline cursor-pointer" @click="openCreateProblem()">New Problem</span> to draft one.
+                          </td>
+                        </tr>
+                      </template>
+                      <template x-for="p in filteredProblems" :key="p.id">
+                        <tr
+                          x-spatial="{ tilt: 0.75, perspective: 1100, scale: 1.003 }"
+                          @mouseenter="move($event.currentTarget, p.difficulty || 'Easy')"
+                          class="stagger-row tilt-row group"
+                        >
+                          <td class="border-b border-[#E2DDD3]/75 py-5 pr-4 pl-5 font-mono text-xs text-[#6E6A61] tabular-nums dark:border-[#2C2B27]/80 dark:text-[#9B968B]">
+                            <div class="depth-cell" x-text="`#${String(p.id).padStart(2, '0')}`"></div>
+                          </td>
+                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 text-sm font-medium text-[#1C1B18] dark:border-[#2C2B27]/80 dark:text-[#EAE6DD]">
+                            <div class="depth-cell-deep" x-text="p.title"></div>
+                          </td>
+                          <td class="max-w-md border-b border-[#E2DDD3]/75 px-4 py-5 text-sm leading-relaxed text-[#6E6A61] dark:border-[#2C2B27]/80 dark:text-[#9B968B]">
+                            <div class="depth-cell">
+                              <p class="line-clamp-2" x-text="p.description"></p>
+                            </div>
+                          </td>
+                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 text-sm dark:border-[#2C2B27]/80">
+                            <div class="depth-cell-deep inline-flex items-center gap-2 text-xs font-medium" :class="statusTextClass(p.difficulty || 'Easy')">
+                              <span
+                                class="status-dot-pulse h-1.5 w-1.5 rounded-full"
+                                :class="statusDotClass(p.difficulty || 'Easy')"
+                                :style="statusDotStyle(p.difficulty || 'Easy')"
+                              ></span>
+                              <span x-text="p.difficulty || 'Easy'"></span>
+                            </div>
+                          </td>
+                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 font-mono text-xs text-[#6E6A61] tabular-nums dark:border-[#2C2B27]/80 dark:text-[#9B968B]">
+                            <div class="depth-cell" x-text="`${p.time_limit || 1.0}s · ${p.memory_limit || 256}MB`"></div>
+                          </td>
+                          <td class="border-b border-[#E2DDD3]/75 py-5 pr-4 pl-4 text-right text-xs whitespace-nowrap dark:border-[#2C2B27]/80">
+                            <div class="depth-cell-deep inline-flex items-center gap-4 opacity-50 transition-opacity duration-200 group-hover:opacity-100 max-sm:opacity-100">
+                              <button
+                                type="button"
+                                @click="openTestCasesModal(p)"
+                                class="font-medium text-[#1C1B18] underline decoration-[#1C1B18]/30 underline-offset-4 hover:decoration-[#1C1B18] dark:text-[#EAE6DD] dark:decoration-[#EAE6DD]/30 dark:hover:decoration-[#EAE6DD]"
+                              >
+                                Test Cases
+                              </button>
+                              <button
+                                type="button"
+                                @click="openEditProblem(p)"
+                                class="font-medium text-[#6E6A61] hover:text-[#1C1B18] dark:text-[#9B968B] dark:hover:text-[#EAE6DD]"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                @click="deleteProblem(p.id)"
+                                class="font-medium text-[#8B2635]/80 hover:text-[#8B2635] dark:text-[#D47A86]/80 dark:hover:text-[#D47A86]"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </section>
 
@@ -904,90 +1368,118 @@
                 </div>
               </div>
 
-              <div class="overflow-x-auto">
-                <table class="min-w-full border-collapse">
-                  <thead>
-                    <tr class="border-b border-[#E2DDD3] dark:border-[#2C2B27]">
-                      <th class="py-3.5 pr-4 pl-4 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Ticket</th>
-                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Requester</th>
-                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Description</th>
-                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Status</th>
-                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Logged</th>
-                      <th class="py-3.5 pr-3 pl-4 text-right font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Resolution</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-[#E2DDD3]/75 dark:divide-[#2C2B27]/80">
-                    <template x-if="filteredTickets.length === 0">
+              <div class="overflow-x-auto px-1 pb-4">
+                <div
+                  x-ref="stage"
+                  x-data="floatingTable()"
+                  @mouseleave="clear()"
+                  class="table-stage relative min-w-full"
+                >
+                  <div
+                    aria-hidden="true"
+                    class="floating-highlight pointer-events-none absolute top-0 right-0 left-0 z-0"
+                    :class="active ? 'opacity-100' : 'opacity-0'"
+                    :style="`transform: translate3d(0, ${y}px, 0); height: ${h}px;`"
+                  >
+                    <span
+                      class="absolute top-2.5 bottom-2.5 left-0 w-[2px] transition-colors duration-300"
+                      :class="barClass(tone)"
+                    ></span>
+                  </div>
+
+                  <table class="relative z-10 min-w-full border-separate border-spacing-0">
+                    <thead>
                       <tr>
-                        <td colspan="6" class="px-4 py-14 text-center text-sm text-[#6E6A61] dark:text-[#9B968B]">
-                          No support tickets in this view.
-                        </td>
+                        <th class="border-b border-[#E2DDD3] py-3.5 pr-4 pl-5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Ticket</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Requester</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Description</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Status</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Logged</th>
+                        <th class="border-b border-[#E2DDD3] py-3.5 pr-4 pl-4 text-right font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Resolution</th>
                       </tr>
-                    </template>
-                    <template x-for="t in filteredTickets" :key="t.id">
-                      <tr class="group transition-colors duration-150 hover:bg-[#EFECE4]/60 dark:hover:bg-[#1B1B19]">
-                        <td class="relative py-5 pr-4 pl-4 font-mono text-xs text-[#6E6A61] tabular-nums dark:text-[#9B968B]">
-                          <span
-                            class="absolute top-3.5 bottom-3.5 left-0 w-[2px] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-                            :class="rowAccentClass(t.status)"
-                          ></span>
-                          <span x-text="`TCK-${String(t.id).padStart(2, '0')}`"></span>
-                        </td>
-                        <td class="px-4 py-5 font-mono text-xs text-[#6E6A61] dark:text-[#9B968B]" x-text="t.user_discord_id"></td>
-                        <td class="max-w-md px-4 py-5 text-sm leading-relaxed text-[#1C1B18] dark:text-[#EAE6DD]" x-text="t.issue_description"></td>
-                        <td class="px-4 py-5 text-sm">
-                          <span class="inline-flex items-center gap-2 text-xs font-medium text-[#1C1B18] dark:text-[#EAE6DD]">
-                            <span
-                              class="h-1.5 w-1.5 rounded-full"
-                              :class="statusDotClass(t.status)"
-                            ></span>
-                            <span x-text="t.status"></span>
-                          </span>
-                        </td>
-                        <td
-                          class="px-4 py-5 font-mono text-xs text-[#6E6A61] dark:text-[#9B968B]"
-                          :title="formatExactDate(t.created_at)"
-                          x-text="formatRelativeTime(t.created_at)"
-                        ></td>
-                        <td class="py-5 pr-3 pl-4 text-right text-xs whitespace-nowrap">
-                          <div class="inline-flex items-center gap-4 opacity-55 transition-opacity duration-200 group-hover:opacity-100 max-sm:opacity-100">
-                            <button
-                              type="button"
-                              x-show="t.status !== 'In-Progress'"
-                              @click="updateTicketStatus(t.id, 'In-Progress')"
-                              class="font-medium text-[#3B5B75] hover:underline dark:text-[#84A8C4]"
-                            >
-                              In-Progress
-                            </button>
-                            <button
-                              type="button"
-                              x-show="t.status !== 'Resolved'"
-                              @click="updateTicketStatus(t.id, 'Resolved')"
-                              class="font-medium text-[#2E5A44] hover:underline dark:text-[#7CA98E]"
-                            >
-                              Resolve
-                            </button>
-                            <button
-                              type="button"
-                              x-show="t.status === 'Resolved'"
-                              @click="updateTicketStatus(t.id, 'Open')"
-                              class="font-medium text-[#6E6A61] hover:text-[#1C1B18] dark:text-[#9B968B] dark:hover:text-[#EAE6DD]"
-                            >
-                              Reopen
-                            </button>
-                            <button
-                              type="button"
-                              @click="removeTicket(t.id)"
-                              class="font-medium text-[#8B2635]/80 hover:text-[#8B2635] dark:text-[#D47A86]/80 dark:hover:text-[#D47A86]"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    </template>
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody
+                      data-stagger-group="tickets"
+                      :class="isSyncing ? 'opacity-0' : 'opacity-100'"
+                    >
+                      <template x-if="filteredTickets.length === 0">
+                        <tr>
+                          <td colspan="6" class="px-4 py-14 text-center text-sm text-[#6E6A61] dark:text-[#9B968B]">
+                            No support tickets in this view.
+                          </td>
+                        </tr>
+                      </template>
+                      <template x-for="t in filteredTickets" :key="t.id">
+                        <tr
+                          x-spatial="{ tilt: 0.75, perspective: 1100, scale: 1.003 }"
+                          @mouseenter="move($event.currentTarget, t.status)"
+                          class="stagger-row tilt-row group"
+                        >
+                          <td class="border-b border-[#E2DDD3]/75 py-5 pr-4 pl-5 font-mono text-xs text-[#6E6A61] tabular-nums dark:border-[#2C2B27]/80 dark:text-[#9B968B]">
+                            <div class="depth-cell" x-text="`TCK-${String(t.id).padStart(2, '0')}`"></div>
+                          </td>
+                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 font-mono text-xs text-[#6E6A61] dark:border-[#2C2B27]/80 dark:text-[#9B968B]">
+                            <div class="depth-cell" x-text="t.user_discord_id"></div>
+                          </td>
+                          <td class="max-w-md border-b border-[#E2DDD3]/75 px-4 py-5 text-sm leading-relaxed text-[#1C1B18] dark:border-[#2C2B27]/80 dark:text-[#EAE6DD]">
+                            <div class="depth-cell-deep" x-text="t.issue_description"></div>
+                          </td>
+                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 text-sm dark:border-[#2C2B27]/80">
+                            <div class="depth-cell-deep inline-flex items-center gap-2 text-xs font-medium" :class="statusTextClass(t.status)">
+                              <span
+                                class="status-dot-pulse h-1.5 w-1.5 rounded-full"
+                                :class="statusDotClass(t.status)"
+                                :style="statusDotStyle(t.status)"
+                              ></span>
+                              <span x-text="t.status"></span>
+                            </div>
+                          </td>
+                          <td
+                            class="border-b border-[#E2DDD3]/75 px-4 py-5 font-mono text-xs text-[#6E6A61] dark:border-[#2C2B27]/80 dark:text-[#9B968B]"
+                            :title="formatExactDate(t.created_at)"
+                          >
+                            <div class="depth-cell" x-text="formatRelativeTime(t.created_at)"></div>
+                          </td>
+                          <td class="border-b border-[#E2DDD3]/75 py-5 pr-4 pl-4 text-right text-xs whitespace-nowrap dark:border-[#2C2B27]/80">
+                            <div class="depth-cell-deep inline-flex items-center gap-4 opacity-50 transition-opacity duration-200 group-hover:opacity-100 max-sm:opacity-100">
+                              <button
+                                type="button"
+                                x-show="t.status !== 'In-Progress'"
+                                @click="updateTicketStatus(t.id, 'In-Progress')"
+                                class="font-medium text-[#3B5B75] hover:underline dark:text-[#84A8C4]"
+                              >
+                                In-Progress
+                              </button>
+                              <button
+                                type="button"
+                                x-show="t.status !== 'Resolved'"
+                                @click="updateTicketStatus(t.id, 'Resolved')"
+                                class="font-medium text-[#2E6F50] hover:underline dark:text-[#6EB38E]"
+                              >
+                                Resolve
+                              </button>
+                              <button
+                                type="button"
+                                x-show="t.status === 'Resolved'"
+                                @click="updateTicketStatus(t.id, 'Open')"
+                                class="font-medium text-[#6E6A61] hover:text-[#1C1B18] dark:text-[#9B968B] dark:hover:text-[#EAE6DD]"
+                              >
+                                Reopen
+                              </button>
+                              <button
+                                type="button"
+                                @click="removeTicket(t.id)"
+                                class="font-medium text-[#8B2635]/80 hover:text-[#8B2635] dark:text-[#D47A86]/80 dark:hover:text-[#D47A86]"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </section>
 
@@ -1007,69 +1499,98 @@
                 </div>
               </div>
 
-              <div class="overflow-x-auto">
-                <table class="min-w-full border-collapse">
-                  <thead>
-                    <tr class="border-b border-[#E2DDD3] dark:border-[#2C2B27]">
-                      <th class="py-3.5 pr-4 pl-4 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Run</th>
-                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Discord User</th>
-                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Problem</th>
-                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Verdict</th>
-                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Runtime</th>
-                      <th class="px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Submitted At</th>
-                      <th class="py-3.5 pr-3 pl-4 text-right font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:text-[#9B968B]">Source</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-[#E2DDD3]/75 dark:divide-[#2C2B27]/80">
-                    <template x-if="filteredSubmissions.length === 0">
+              <div class="overflow-x-auto px-1 pb-4">
+                <div
+                  x-ref="stage"
+                  x-data="floatingTable()"
+                  @mouseleave="clear()"
+                  class="table-stage relative min-w-full"
+                >
+                  <div
+                    aria-hidden="true"
+                    class="floating-highlight pointer-events-none absolute top-0 right-0 left-0 z-0"
+                    :class="active ? 'opacity-100' : 'opacity-0'"
+                    :style="`transform: translate3d(0, ${y}px, 0); height: ${h}px;`"
+                  >
+                    <span
+                      class="absolute top-2.5 bottom-2.5 left-0 w-[2px] transition-colors duration-300"
+                      :class="barClass(tone)"
+                    ></span>
+                  </div>
+
+                  <table class="relative z-10 min-w-full border-separate border-spacing-0">
+                    <thead>
                       <tr>
-                        <td colspan="7" class="px-4 py-14 text-center text-sm text-[#6E6A61] dark:text-[#9B968B]">
-                          No code submissions recorded yet.
-                        </td>
+                        <th class="border-b border-[#E2DDD3] py-3.5 pr-4 pl-5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Run</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Discord User</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Problem</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Verdict</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Runtime</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Submitted At</th>
+                        <th class="border-b border-[#E2DDD3] py-3.5 pr-4 pl-4 text-right font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Source</th>
                       </tr>
-                    </template>
-                    <template x-for="s in filteredSubmissions" :key="s.id">
-                      <tr class="group transition-colors duration-150 hover:bg-[#EFECE4]/60 dark:hover:bg-[#1B1B19]">
-                        <td class="relative py-5 pr-4 pl-4 font-mono text-xs text-[#6E6A61] tabular-nums dark:text-[#9B968B]">
-                          <span
-                            class="absolute top-3.5 bottom-3.5 left-0 w-[2px] opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-                            :class="rowAccentClass(s.status)"
-                          ></span>
-                          <span x-text="`#${String(s.id).padStart(2, '0')}`"></span>
-                        </td>
-                        <td class="px-4 py-5 font-mono text-xs text-[#6E6A61] dark:text-[#9B968B]" x-text="s.user_discord_id"></td>
-                        <td class="px-4 py-5 text-sm font-medium text-[#1C1B18] dark:text-[#EAE6DD]" x-text="`Problem #${s.problem_id}`"></td>
-                        <td class="px-4 py-5 text-sm">
-                          <span class="inline-flex items-center gap-2 text-xs font-medium text-[#1C1B18] dark:text-[#EAE6DD]">
-                            <span
-                              class="h-1.5 w-1.5 rounded-full"
-                              :class="statusDotClass(s.status)"
-                            ></span>
-                            <span x-text="s.status"></span>
-                          </span>
-                        </td>
-                        <td
-                          class="px-4 py-5 font-mono text-xs text-[#6E6A61] tabular-nums dark:text-[#9B968B]"
-                          x-text="s.runtime != null ? `${s.runtime}s` : '—'"
-                        ></td>
-                        <td
-                          class="px-4 py-5 text-xs text-[#6E6A61] dark:text-[#9B968B]"
-                          :title="formatExactDate(s.created_at)"
-                          x-text="formatRelativeTime(s.created_at)"
-                        ></td>
-                        <td class="py-5 pr-3 pl-4 text-right whitespace-nowrap">
-                          <button
-                            type="button"
-                            @click="openSubmissionDetail(s)"
-                            class="pointer-events-none inline-flex translate-x-1 items-center gap-1.5 border border-[#1C1B18]/25 bg-[#FBF9F5] px-3 py-1 font-mono text-[11px] font-medium text-[#1C1B18] opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-x-0 group-hover:opacity-100 hover:border-[#1C1B18] focus:pointer-events-auto focus:opacity-100 max-sm:pointer-events-auto max-sm:translate-x-0 max-sm:opacity-100 dark:border-[#EAE6DD]/25 dark:bg-[#1B1B19] dark:text-[#EAE6DD] dark:hover:border-[#EAE6DD]"
+                    </thead>
+                    <tbody
+                      data-stagger-group="submissions"
+                      :class="isSyncing ? 'opacity-0' : 'opacity-100'"
+                    >
+                      <template x-if="filteredSubmissions.length === 0">
+                        <tr>
+                          <td colspan="7" class="px-4 py-14 text-center text-sm text-[#6E6A61] dark:text-[#9B968B]">
+                            No code submissions recorded yet.
+                          </td>
+                        </tr>
+                      </template>
+                      <template x-for="s in filteredSubmissions" :key="s.id">
+                        <tr
+                          x-spatial="{ tilt: 0.75, perspective: 1100, scale: 1.003 }"
+                          @mouseenter="move($event.currentTarget, s.status)"
+                          class="stagger-row tilt-row group"
+                        >
+                          <td class="border-b border-[#E2DDD3]/75 py-5 pr-4 pl-5 font-mono text-xs text-[#6E6A61] tabular-nums dark:border-[#2C2B27]/80 dark:text-[#9B968B]">
+                            <div class="depth-cell" x-text="`#${String(s.id).padStart(2, '0')}`"></div>
+                          </td>
+                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 font-mono text-xs text-[#6E6A61] dark:border-[#2C2B27]/80 dark:text-[#9B968B]">
+                            <div class="depth-cell" x-text="s.user_discord_id"></div>
+                          </td>
+                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 text-sm font-medium text-[#1C1B18] dark:border-[#2C2B27]/80 dark:text-[#EAE6DD]">
+                            <div class="depth-cell-deep" x-text="`Problem #${s.problem_id}`"></div>
+                          </td>
+                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 text-sm dark:border-[#2C2B27]/80">
+                            <div class="depth-cell-deep inline-flex items-center gap-2 text-xs font-medium" :class="statusTextClass(s.status)">
+                              <span
+                                class="status-dot-pulse h-1.5 w-1.5 rounded-full"
+                                :class="statusDotClass(s.status)"
+                                :style="statusDotStyle(s.status)"
+                              ></span>
+                              <span x-text="s.status"></span>
+                            </div>
+                          </td>
+                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 font-mono text-xs text-[#6E6A61] tabular-nums dark:border-[#2C2B27]/80 dark:text-[#9B968B]">
+                            <div class="depth-cell" x-text="s.runtime != null ? `${s.runtime}s` : '—'"></div>
+                          </td>
+                          <td
+                            class="border-b border-[#E2DDD3]/75 px-4 py-5 text-xs text-[#6E6A61] dark:border-[#2C2B27]/80 dark:text-[#9B968B]"
+                            :title="formatExactDate(s.created_at)"
                           >
-                            View Code →
-                          </button>
-                        </td>
-                      </tr>
-                    </template>
-                  </tbody>
-                </table>
+                            <div class="depth-cell" x-text="formatRelativeTime(s.created_at)"></div>
+                          </td>
+                          <td class="border-b border-[#E2DDD3]/75 py-5 pr-4 pl-4 text-right whitespace-nowrap dark:border-[#2C2B27]/80">
+                            <div class="depth-cell-deep">
+                              <button
+                                type="button"
+                                @click="openSubmissionDetail(s)"
+                                class="pointer-events-none inline-flex translate-x-1 items-center gap-1.5 border border-[#1C1B18]/25 bg-[#FBF9F5] px-3 py-1 font-mono text-[11px] font-medium text-[#1C1B18] opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-x-0 group-hover:opacity-100 hover:border-[#1C1B18] focus:pointer-events-auto focus:opacity-100 max-sm:pointer-events-auto max-sm:translate-x-0 max-sm:opacity-100 dark:border-[#EAE6DD]/25 dark:bg-[#1B1B19] dark:text-[#EAE6DD] dark:hover:border-[#EAE6DD]"
+                              >
+                                View Code →
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </section>
           </div>
@@ -1088,7 +1609,8 @@
     >
       <div
         @click.outside="problemModalOpen = false"
-        class="w-full max-w-lg border border-[#E2DDD3] bg-[#FBF9F5] p-7 shadow-xl dark:border-[#2C2B27] dark:bg-[#1B1B19]"
+        class="w-full max-w-lg border border-[#E2DDD3] bg-[#FBF9F5] p-7 dark:border-[#2C2B27] dark:bg-[#1B1B19]"
+        style="box-shadow: var(--shadow-lifted)"
       >
         <p class="font-mono text-[10px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
           Problem Specification
@@ -1172,7 +1694,8 @@
             </button>
             <button
               type="submit"
-              class="border border-[#1C1B18] bg-[#1C1B18] px-5 py-2 text-xs font-medium text-[#F6F4EF] hover:bg-[#33312C] dark:border-[#EAE6DD] dark:bg-[#EAE6DD] dark:text-[#141413] dark:hover:bg-white"
+              x-spatial="{ enableTilt: false }"
+              class="btn-spotlight btn-spotlight-dark border border-[#1C1B18] bg-[#1C1B18] px-5 py-2 text-xs font-medium text-[#F6F4EF] hover:bg-[#33312C] dark:border-[#EAE6DD] dark:bg-[#EAE6DD] dark:text-[#141413] dark:hover:bg-white"
             >
               Save Problem
             </button>
@@ -1189,7 +1712,8 @@
     >
       <div
         @click.outside="testCaseModalOpen = false"
-        class="w-full max-w-2xl border border-[#E2DDD3] bg-[#FBF9F5] p-7 shadow-xl dark:border-[#2C2B27] dark:bg-[#1B1B19]"
+        class="w-full max-w-2xl border border-[#E2DDD3] bg-[#FBF9F5] p-7 dark:border-[#2C2B27] dark:bg-[#1B1B19]"
+        style="box-shadow: var(--shadow-lifted)"
       >
         <div class="flex items-start justify-between border-b border-[#E2DDD3] pb-4 dark:border-[#2C2B27]">
           <div>
@@ -1213,7 +1737,7 @@
         <!-- Existing Test Cases -->
         <div class="mt-5 max-h-60 space-y-3 overflow-y-auto">
           <template x-if="testCases.length === 0">
-            <p class="border border-dashed border-[#D7D1C5] py-6 text-center text-xs text-[#9A6B2F] dark:border-[#2C2B27] dark:text-[#D4A362]">
+            <p class="border border-dashed border-[#D7D1C5] py-6 text-center text-xs text-[#8A5D27] dark:border-[#2C2B27] dark:text-[#D4A362]">
               No test cases configured yet. Add at least one case below so the Sandbox can judge runs.
             </p>
           </template>
@@ -1276,7 +1800,8 @@
             </button>
             <button
               type="submit"
-              class="border border-[#1C1B18] bg-[#1C1B18] px-4 py-2 text-xs font-medium text-[#F6F4EF] hover:bg-[#33312C] dark:border-[#EAE6DD] dark:bg-[#EAE6DD] dark:text-[#141413]"
+              x-spatial="{ enableTilt: false }"
+              class="btn-spotlight btn-spotlight-dark border border-[#1C1B18] bg-[#1C1B18] px-4 py-2 text-xs font-medium text-[#F6F4EF] hover:bg-[#33312C] dark:border-[#EAE6DD] dark:bg-[#EAE6DD] dark:text-[#141413]"
             >
               + Add Test Case
             </button>
@@ -1293,7 +1818,8 @@
     >
       <div
         @click.outside="ticketModalOpen = false"
-        class="w-full max-w-md border border-[#E2DDD3] bg-[#FBF9F5] p-7 shadow-xl dark:border-[#2C2B27] dark:bg-[#1B1B19]"
+        class="w-full max-w-md border border-[#E2DDD3] bg-[#FBF9F5] p-7 dark:border-[#2C2B27] dark:bg-[#1B1B19]"
+        style="box-shadow: var(--shadow-lifted)"
       >
         <p class="font-mono text-[10px] tracking-[0.16em] text-[#6E6A61] uppercase dark:text-[#9B968B]">
           Helpdesk Entry
@@ -1335,7 +1861,8 @@
             </button>
             <button
               type="submit"
-              class="border border-[#1C1B18] bg-[#1C1B18] px-5 py-2 text-xs font-medium text-[#F6F4EF] hover:bg-[#33312C] dark:border-[#EAE6DD] dark:bg-[#EAE6DD] dark:text-[#141413]"
+              x-spatial="{ enableTilt: false }"
+              class="btn-spotlight btn-spotlight-dark border border-[#1C1B18] bg-[#1C1B18] px-5 py-2 text-xs font-medium text-[#F6F4EF] hover:bg-[#33312C] dark:border-[#EAE6DD] dark:bg-[#EAE6DD] dark:text-[#141413]"
             >
               Submit Ticket
             </button>
@@ -1352,7 +1879,8 @@
     >
       <div
         @click.outside="submissionModalOpen = false"
-        class="w-full max-w-2xl border border-[#E2DDD3] bg-[#FBF9F5] p-7 shadow-xl dark:border-[#2C2B27] dark:bg-[#1B1B19]"
+        class="w-full max-w-2xl border border-[#E2DDD3] bg-[#FBF9F5] p-7 dark:border-[#2C2B27] dark:bg-[#1B1B19]"
+        style="box-shadow: var(--shadow-lifted)"
       >
         <div class="flex items-start justify-between border-b border-[#E2DDD3] pb-4 dark:border-[#2C2B27]">
           <div>
@@ -1379,7 +1907,11 @@
               <span>Problem: <strong class="font-medium text-[#1C1B18] dark:text-[#EAE6DD]" x-text="`#${selectedSubmission.problem_id}`"></strong></span>
               <span class="inline-flex items-center gap-1.5">
                 Verdict:
-                <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(selectedSubmission.status)"></span>
+                <span
+                  class="status-dot-pulse h-1.5 w-1.5 rounded-full"
+                  :class="statusDotClass(selectedSubmission.status)"
+                  :style="statusDotStyle(selectedSubmission.status)"
+                ></span>
                 <strong class="font-medium" :class="statusTextClass(selectedSubmission.status)" x-text="selectedSubmission.status"></strong>
               </span>
               <span>Runtime: <strong class="font-medium text-[#1C1B18] dark:text-[#EAE6DD]" x-text="selectedSubmission.runtime != null ? `${selectedSubmission.runtime}s` : '—'"></strong></span>
