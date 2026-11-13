@@ -18,7 +18,6 @@ def get_db():
     finally:
         db.close()
 
-# 1. API: User gửi báo cáo lỗi mới
 @router.post("/", response_model=TicketResponse)
 def create_ticket(ticket_in: TicketCreate, db: Session = Depends(get_db)):
     new_ticket = Ticket(**ticket_in.model_dump())
@@ -27,13 +26,11 @@ def create_ticket(ticket_in: TicketCreate, db: Session = Depends(get_db)):
     db.refresh(new_ticket)
     return new_ticket
 
-# 2. API: Lấy danh sách toàn bộ Ticket (dành cho Admin quản lý)
 @router.get("/", response_model=list[TicketResponse])
 def get_all_tickets(db: Session = Depends(get_db)):
     tickets = db.query(Ticket).order_by(Ticket.id.desc()).all()
     return tickets
 
-# 3. API: Cập nhật trạng thái Ticket (Open / In-Progress / Resolved)
 @router.patch("/{ticket_id}", response_model=TicketResponse)
 def update_ticket_status(ticket_id: int, body: TicketStatusUpdate, db: Session = Depends(get_db)):
     ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
@@ -50,7 +47,6 @@ def update_ticket_status(ticket_id: int, body: TicketStatusUpdate, db: Session =
     db.refresh(ticket)
     return ticket
 
-# 4. API: Xóa Ticket
 @router.delete("/{ticket_id}")
 def delete_ticket(ticket_id: int, db: Session = Depends(get_db)):
     ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()

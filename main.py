@@ -9,15 +9,13 @@ from app.models.base import Base
 from app.models.problem import Problem
 from app.models.submission import Submission
 from app.models.ticket import Ticket
-
-# 1. THÊM DÒNG IMPORT NÀY:
 from app.api.endpoints import problems, submissions, tickets
+
 app = FastAPI()
 
 BASE_DIR = Path(__file__).resolve().parent
 FE_DIR = BASE_DIR / "FE"
 
-# Mount thư mục FE/asset để các file CSS, JS và ảnh (/images/...) hiển thị được
 app.mount("/asset", StaticFiles(directory=str(FE_DIR / "asset")), name="asset")
 app.mount("/images", StaticFiles(directory=str(FE_DIR / "asset" / "images")), name="images")
 
@@ -36,6 +34,7 @@ def render_with_includes(file_path: Path) -> str:
 app.include_router(problems.router, prefix="/api/problems", tags=["Problems"])
 app.include_router(submissions.router, prefix="/api/submissions", tags=["Submissions"])
 app.include_router(tickets.router, prefix="/api/tickets", tags=["Tickets"])
+
 @app.on_event("startup")
 def startup_db():
     try:

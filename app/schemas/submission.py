@@ -3,18 +3,15 @@ from typing import Optional
 from datetime import datetime
 from app.models.submission import SubmissionStatus
 
-# Các trường thông tin cơ bản
 class SubmissionBase(BaseModel):
     user_discord_id: str
     problem_id: int
     source_code: str
     language: str
 
-# Dữ liệu yêu cầu khi user GỬI CODE (POST)
 class SubmissionCreate(SubmissionBase):
     pass
 
-# Dữ liệu TRẢ VỀ sau khi lưu thành công (GET)
 class SubmissionResponse(SubmissionBase):
     id: int
     status: SubmissionStatus

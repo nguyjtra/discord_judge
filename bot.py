@@ -4,25 +4,23 @@ import requests
 import os
 from dotenv import load_dotenv
 import asyncio
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 API_URL = "http://127.0.0.1:8000/api"
-# KHỞI TẠO BOT
+
 intents = discord.Intents.default()
 intents.message_content = True
-# Lệnh bắt đầu bằng dấu *
 bot = commands.Bot(command_prefix='*', intents=intents)
-# SỰ KIỆN KHI BOT TỈNH DẬY
+
 @bot.event
 async def on_ready():
     print("let coding!!!")
 
-# LỆNH 1: NHẬN BÀI NỘP
 @bot.command()
 async def submit(ctx, problem_id: int, *, code: str):
     await ctx.send("Sending Code to FastAPI...")
     
-    # Dọn dẹp dấu nháy (```python) nếu người dùng dán code có format trên Discord
     clean_code = code.strip("`")
     if clean_code.startswith("python"):
         clean_code = clean_code[6:].strip()
@@ -34,7 +32,6 @@ async def submit(ctx, problem_id: int, *, code: str):
         "language": "python"
     }
     
-    # Dùng biến API_URL cho gọn và chuẩn
     ket_qua = requests.post(f"{API_URL}/submissions/", json=du_lieu)
     if ket_qua.status_code == 200:
         ma_bai_nop = ket_qua.json().get("id")
@@ -56,7 +53,7 @@ async def submit(ctx, problem_id: int, *, code: str):
         await ctx.send("Timeout waiting for judge result.")
     else:
         await ctx.send("Error when submitting code.")
-# LỆNH 2: HỎI AI GIẢI THÍCH
+
 @bot.command()
 async def explain(ctx, submission_id: int):
     await ctx.send(f"AI support #{submission_id}...")
@@ -73,10 +70,8 @@ async def explain(ctx, submission_id: int):
     except Exception as e:
         await ctx.send("Server connection error.")
 
-# LỆNH 3: BÁO LỖI (TICKET)
 @bot.command()
 async def ticket(ctx, *, description: str):
-    """use this command to report issue : *ticket <.......>"""
     await ctx.send("Sending...")
     
     du_lieu = {
@@ -96,7 +91,6 @@ async def ticket(ctx, *, description: str):
     except Exception as e:
         await ctx.send("Router problem")
 
-# COMMAND 4: SHOW PROBLEM LIST (*problems)
 @bot.command(name='problems')
 async def list_problems(ctx):
     await ctx.send("Loading problems...")
@@ -118,7 +112,6 @@ async def list_problems(ctx):
     except Exception as e:
         await ctx.send("Server connection error.")
 
-# COMMAND 5: SHOW PROBLEM DETAILS (*problem <id>)
 @bot.command(name='problem')
 async def show_problem(ctx, problem_id: int):
     try:
@@ -135,4 +128,5 @@ async def show_problem(ctx, problem_id: int):
             await ctx.send("Server error.")
     except Exception as e:
         await ctx.send("Server connection error.")
+
 bot.run(TOKEN)
