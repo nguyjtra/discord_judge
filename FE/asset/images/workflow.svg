@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="100%" height="100%" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace">
+  <defs>
+    <marker id="arrowGold" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#D4A362"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#6EB38E"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#84A8C4"/>
+    </marker>
+  </defs>
+
+  <rect width="960" height="560" rx="12" fill="#141413"/>
+
+  <!-- Title -->
+  <text x="40" y="42" fill="#EAE6DD" font-size="16" font-weight="bold" letter-spacing="1.5">SYSTEM WORKFLOW — END-TO-END EXECUTION FLOWS</text>
+  <line x1="40" y1="56" x2="920" y2="56" stroke="#2C2B27" stroke-width="1.5"/>
+
+  <!-- ==================== WORKFLOW 1: CODE SUBMISSION & DOCKER JUDGE ==================== -->
+  <text x="40" y="92" fill="#6EB38E" font-size="13" font-weight="bold">1. CODE SUBMISSION &amp; DOCKER SANDBOX JUDGING (*submit)</text>
+
+  <!-- Step 1 -->
+  <rect x="40" y="108" width="175" height="72" rx="6" fill="#1B1B19" stroke="#6EB38E" stroke-width="1.5"/>
+  <text x="54" y="132" fill="#6EB38E" font-size="11" font-weight="bold">STEP 1: Discord</text>
+  <text x="54" y="152" fill="#EAE6DD" font-size="11">User sends</text>
+  <text x="54" y="168" fill="#9B968B" font-size="11">*submit &lt;id&gt; &lt;code&gt;</text>
+
+  <line x1="215" y1="144" x2="255" y2="144" stroke="#6EB38E" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- Step 2 -->
+  <rect x="260" y="108" width="195" height="72" rx="6" fill="#1B1B19" stroke="#6EB38E" stroke-width="1.5"/>
+  <text x="274" y="132" fill="#6EB38E" font-size="11" font-weight="bold">STEP 2: FastAPI + MySQL</text>
+  <text x="274" y="152" fill="#EAE6DD" font-size="11">Save status = Pending</text>
+  <text x="274" y="168" fill="#9B968B" font-size="11">Run BackgroundTask</text>
+
+  <line x1="455" y1="144" x2="495" y2="144" stroke="#6EB38E" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- Step 3 -->
+  <rect x="500" y="108" width="205" height="72" rx="6" fill="#1B1B19" stroke="#6EB38E" stroke-width="1.5"/>
+  <text x="514" y="132" fill="#6EB38E" font-size="11" font-weight="bold">STEP 3: Docker Sandbox</text>
+  <text x="514" y="152" fill="#EAE6DD" font-size="11">python:3.12-alpine</text>
+  <text x="514" y="168" fill="#9B968B" font-size="11">256MB RAM | 1-2s Timeout</text>
+
+  <line x1="705" y1="144" x2="745" y2="144" stroke="#6EB38E" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+  <!-- Step 4 -->
+  <rect x="750" y="108" width="170" height="72" rx="6" fill="#1B1B19" stroke="#6EB38E" stroke-width="1.5"/>
+  <text x="764" y="132" fill="#6EB38E" font-size="11" font-weight="bold">STEP 4: Verdict</text>
+  <text x="764" y="152" fill="#EAE6DD" font-size="11">Accepted / WA</text>
+  <text x="764" y="168" fill="#9B968B" font-size="11">Runtime Error / TLE</text>
+
+
+  <!-- ==================== WORKFLOW 2: AI ERROR EXPLANATION ==================== -->
+  <text x="40" y="236" fill="#D4A362" font-size="13" font-weight="bold">2. TOKEN-OPTIMIZED AI ERROR EXPLANATION (*explain)</text>
+
+  <!-- Step 1 -->
+  <rect x="40" y="252" width="175" height="72" rx="6" fill="#1B1B19" stroke="#D4A362" stroke-width="1.5"/>
+  <text x="54" y="276" fill="#D4A362" font-size="11" font-weight="bold">STEP 1: Discord</text>
+  <text x="54" y="296" fill="#EAE6DD" font-size="11">User sends</text>
+  <text x="54" y="312" fill="#9B968B" font-size="11">*explain &lt;sub_id&gt;</text>
+
+  <line x1="215" y1="288" x2="255" y2="288" stroke="#D4A362" stroke-width="2" marker-end="url(#arrowGold)"/>
+
+  <!-- Step 2 -->
+  <rect x="260" y="252" width="195" height="72" rx="6" fill="#1B1B19" stroke="#D4A362" stroke-width="1.5"/>
+  <text x="274" y="276" fill="#D4A362" font-size="11" font-weight="bold">STEP 2: Line Parser</text>
+  <text x="274" y="296" fill="#EAE6DD" font-size="11">Read traceback line #</text>
+  <text x="274" y="312" fill="#9B968B" font-size="11">Cut 5-line code snippet</text>
+
+  <line x1="455" y1="288" x2="495" y2="288" stroke="#D4A362" stroke-width="2" marker-end="url(#arrowGold)"/>
+
+  <!-- Step 3 -->
+  <rect x="500" y="252" width="205" height="72" rx="6" fill="#1B1B19" stroke="#D4A362" stroke-width="1.5"/>
+  <text x="514" y="276" fill="#D4A362" font-size="11" font-weight="bold">STEP 3: Gemini AI</text>
+  <text x="514" y="296" fill="#EAE6DD" font-size="11">gemini-3.5-flash-lite</text>
+  <text x="514" y="312" fill="#9B968B" font-size="11">80-90% less code input</text>
+
+  <line x1="705" y1="288" x2="745" y2="288" stroke="#D4A362" stroke-width="2" marker-end="url(#arrowGold)"/>
+
+  <!-- Step 4 -->
+  <rect x="750" y="252" width="170" height="72" rx="6" fill="#1B1B19" stroke="#D4A362" stroke-width="1.5"/>
+  <text x="764" y="276" fill="#D4A362" font-size="11" font-weight="bold">STEP 4: Reply</text>
+  <text x="764" y="296" fill="#EAE6DD" font-size="11">Line-by-line cause</text>
+  <text x="764" y="312" fill="#9B968B" font-size="11">&amp; fixed code in Discord</text>
+
+
+  <!-- ==================== WORKFLOW 3: IT SUPPORT TICKET & SLA COUNTDOWN ==================== -->
+  <text x="40" y="380" fill="#84A8C4" font-size="13" font-weight="bold">3. IT SUPPORT TICKET, SLA COUNTDOWN &amp; EMAIL ALERT (*ticket)</text>
+
+  <!-- Step 1 -->
+  <rect x="40" y="396" width="175" height="84" rx="6" fill="#1B1B19" stroke="#84A8C4" stroke-width="1.5"/>
+  <text x="54" y="420" fill="#84A8C4" font-size="11" font-weight="bold">STEP 1: Discord UI</text>
+  <text x="54" y="440" fill="#EAE6DD" font-size="11">User clicks Button:</text>
+  <text x="54" y="456" fill="#D47A86" font-size="11">• Priority (15m)</text>
+  <text x="54" y="472" fill="#84A8C4" font-size="11">• Necessary (3h)</text>
+
+  <line x1="215" y1="438" x2="255" y2="438" stroke="#84A8C4" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- Step 2 -->
+  <rect x="260" y="396" width="195" height="84" rx="6" fill="#1B1B19" stroke="#84A8C4" stroke-width="1.5"/>
+  <text x="274" y="420" fill="#84A8C4" font-size="11" font-weight="bold">STEP 2: FastAPI + SMTP</text>
+  <text x="274" y="440" fill="#EAE6DD" font-size="11">Save deadline in MySQL</text>
+  <text x="274" y="458" fill="#9B968B" font-size="11">Send Gmail alert to</text>
+  <text x="274" y="472" fill="#9B968B" font-size="11">Admin in background</text>
+
+  <line x1="455" y1="438" x2="495" y2="438" stroke="#84A8C4" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- Step 3 -->
+  <rect x="500" y="396" width="205" height="84" rx="6" fill="#1B1B19" stroke="#84A8C4" stroke-width="1.5"/>
+  <text x="514" y="420" fill="#84A8C4" font-size="11" font-weight="bold">STEP 3: Admin Console</text>
+  <text x="514" y="440" fill="#EAE6DD" font-size="11">Live 1s Countdown</text>
+  <text x="514" y="458" fill="#9B968B" font-size="11">Shows Priority, Status</text>
+  <text x="514" y="472" fill="#9B968B" font-size="11">&amp; Remaining Time</text>
+
+  <line x1="705" y1="438" x2="745" y2="438" stroke="#84A8C4" stroke-width="2" marker-end="url(#arrowBlue)"/>
+
+  <!-- Step 4 -->
+  <rect x="750" y="396" width="170" height="84" rx="6" fill="#1B1B19" stroke="#84A8C4" stroke-width="1.5"/>
+  <text x="764" y="420" fill="#84A8C4" font-size="11" font-weight="bold">STEP 4: Resolution</text>
+  <text x="764" y="440" fill="#6EB38E" font-size="11">• Admin -&gt; Solved</text>
+  <text x="764" y="458" fill="#D47A86" font-size="11">• 00:00:00 -&gt; Auto</text>
+  <text x="764" y="472" fill="#D47A86" font-size="11">  marks as Expired</text>
+</svg>

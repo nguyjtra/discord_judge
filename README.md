@@ -4,9 +4,69 @@ A web and Discord application that lets users view coding problems, submit Pytho
 
 ---
 
+## System Workflow
+
+![System Workflow](./FE/asset/images/workflow.svg)
+
+### 1. Code Submission & Docker Judging (`*submit <id> <code>`)
+```text
+[Discord User] ──1. *submit──> [FastAPI + MySQL] ──2. BackgroundTask──> [Docker Container (256MB, 1-2s)] ──3. Verdict──> [Discord Reply]
+```
+1. **Submit:** User sends Python code on Discord using `*submit <problem_id> <code>`.
+2. **Queue:** FastAPI saves the submission into MySQL with status `Pending` and starts a background task.
+3. **Sandbox Run:** The worker runs the code against each Test Case inside an isolated `python:3.12-alpine` Docker container (`256MB` RAM limit, no internet, read-only files, `1.0s - 2.0s` timeout).
+4. **Result:** The status updates to `Accepted`, `Wrong Answer`, `Runtime Error`, or `TLE` (Time Limit Exceeded) and the bot tags the user on Discord with the result.
+
+### 2. AI Error Explanation (`*explain <submission_id>`)
+```text
+[Discord User] ──1. *explain──> [Traceback Parser] ──2. Cut 5-Line Snippet──> [Gemini AI] ──3. Explanation & Fix──> [Discord Reply]
+```
+1. **Request:** User types `*explain <submission_id>` after a failed submission.
+2. **Slice Error Lines:** FastAPI reads the saved `error_message` traceback, finds the exact error line number, and extracts only **5 lines of code** (`2 lines above`, `the error line`, and `2 lines below`), cutting code input by 80%–90% on 25–50 line submissions.
+3. **AI Response:** Gemini explains the cause of the error in English and replies on Discord with how to fix it.
+
+### 3. IT Ticket & SLA Countdown (`*ticket <description>`)
+```text
+[Discord Buttons] ──1. Select Priority──> [FastAPI + Gmail SMTP] ──2. Live 1s Timer──> [Admin Web Page] ──3. Solved / Auto-Expired
+```
+1. **Classify:** User types `*ticket <description>` and clicks one of 2 buttons on Discord:
+   - **Priority (System / API):** Sets a `15-minute` countdown deadline.
+   - **Necessary (Problem / Code):** Sets a `3-hour` countdown deadline.
+2. **Email Alert:** FastAPI saves the ticket to MySQL and sends an email notification to the Admin via Gmail SMTP (`port 465`).
+3. **Track & Expire:** The Admin web page counts down every `1 second`. If the timer reaches `00:00:00` before being handled, the status automatically changes to `Expired`; once fixed, the Admin marks it as `Solved`.
+
+---
+
 ## Database ERD (Entity-Relationship Diagram)
 
 ![Database ERD](./FE/asset/images/erd.svg)
+
+```text
++-----------------------+          1          N  +----------------------------+
+|       problems        |-----------------------<|         test_cases         |
++-----------------------+                        +----------------------------+
+| PK  id          (INT) |                        | PK  id               (INT) |
+|     title   (VARCHAR) |                        | FK  problem_id       (INT) |
+|     description(TEXT) |                        |     input_data      (TEXT) |
+|     time_limit(FLOAT) |                        |     expected_output (TEXT) |
+|     memory_limit(INT) |                        +----------------------------+
+|     difficulty        |
++-----------------------+          1          N  +----------------------------+
+            |-----------------------------------<|        submissions         |
+                                                 +----------------------------+
++-----------------------+                        | PK  id               (INT) |
+|        tickets        |                        |     user_discord_id        |
++-----------------------+                        | FK  problem_id       (INT) |
+| PK  id          (INT) |                        |     source_code     (TEXT) |
+|     user_discord_id   |                        |     language     (VARCHAR) |
+|     issue_description |                        |     status          (ENUM) |
+|     priority(VARCHAR) |                        |     runtime        (FLOAT) |
+|     status  (VARCHAR) |                        |     memory         (FLOAT) |
+|     created_at        |                        |     error_message   (TEXT) |
+|     deadline          |                        |     created_at  (DATETIME) |
+|     closed_at         |                        +----------------------------+
++-----------------------+
+```
 
 - **`problems (1) ───< (N) test_cases`**: One coding problem has many test cases (`test_cases.problem_id` references `problems.id`).
 - **`problems (1) ───< (N) submissions`**: One coding problem receives many code submissions (`submissions.problem_id` references `problems.id`).
@@ -17,23 +77,22 @@ A web and Discord application that lets users view coding problems, submit Pytho
 ## Main Features (With Exact Specs)
 
 1. **Docker Code Sandbox (`app/workers/sandbox_worker.py`):**
-
    - Runs user-submitted Python code inside an isolated `python:3.12-alpine` Docker container.
    - Enforces a `256MB` RAM limit, disables internet access (`network_disabled=True`), mounts files as read-only, and stops infinite loops using a `1.0s - 2.0s` execution timeout (`TLE`).
-2. **AI Error Helper (`app/services/ai_service.py`):**
 
+2. **AI Error Helper (`app/services/ai_service.py`):**
    - Reads the Python error traceback to find the exact line number that crashed.
    - Cuts AI code input by 80%–90% on 25–50 line submissions by extracting 5-line code snippet (`2 lines before`, `the error line`, and `2 lines after`) to send to the `gemini-3.5-flash-lite` model instead of sending the whole file.
    - For `Wrong Answer` submissions, attaches the failed Test Case `Input`, `Your Output`, and `Expected Output` so the AI can explain the logic mistake.
-3. **IT Support Tickets with Countdown & Email (`app/api/endpoints/tickets.py`):**
 
+3. **IT Support Tickets with Countdown & Email (`app/api/endpoints/tickets.py`):**
    - Users report issues from Discord using interactive buttons with 2 priority levels:
      - **Priority (System / API):** `15-minute` countdown timer.
      - **Necessary (Problem / Code):** `3-hour` countdown timer.
    - The Admin web page updates the countdown every `1 second` and automatically changes the ticket status from `Open` / `In-Progress` to `Expired` when time runs out.
    - Automatically sends an email alert to the Admin via Gmail SMTP (`port 465`) when a new ticket is created.
-4. **Database & API (`app/models/`, `app/api/endpoints/`):**
 
+4. **Database & API (`app/models/`, `app/api/endpoints/`):**
    - **4 MySQL tables:** `problems`, `test_cases`, `submissions`, and `tickets`.
    - **15 REST API endpoints** built with FastAPI and SQLAlchemy.
 
@@ -64,30 +123,29 @@ This bot was created to provide an easy way to code directly on Discord without 
 ## How to Run
 
 1. **Install dependencies:**
-
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
    ```
-2. **Set up `.env`:**
 
+2. **Set up `.env`:**
    ```bash
    cp .env.example .env
    ```
-3. **Download Docker image:**
 
+3. **Download Docker image:**
    ```bash
    docker pull python:3.12-alpine
    ```
-4. **Start FastAPI Server:**
 
+4. **Start FastAPI Server:**
    ```bash
    uvicorn main:app --reload
    ```
    Admin page: `http://127.0.0.1:8000/admin`
-5. **Start Discord Bot:**
 
+5. **Start Discord Bot:**
    ```bash
    python bot.py
    ```
