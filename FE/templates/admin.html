@@ -232,13 +232,19 @@
       }
 
       /* Sliding Floating Highlight Background for Tables */
+      .table-stage {
+        min-width: 100%;
+        width: max-content;
+      }
+
       .floating-highlight {
         background-color: rgba(239, 236, 228, 0.85);
         box-shadow: var(--shadow-row-float);
         border-radius: 6px;
-        will-change: transform, height, opacity;
+        will-change: transform, width, height, opacity;
         transition:
           transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+          width 0.24s cubic-bezier(0.22, 1, 0.36, 1),
           height 0.24s cubic-bezier(0.22, 1, 0.36, 1),
           opacity 0.18s ease;
       }
@@ -642,13 +648,13 @@
             return "Solved ✓";
           }
           if (t.status === "Expired") {
-            return "00:00:00 (Expired)";
+            return "00:00:00";
           }
           const deadlineDate = this.parseUtcDate(t.deadline);
           if (!deadlineDate) return "—";
           const diffMs = deadlineDate.getTime() - this.nowTick;
           if (diffMs <= 0) {
-            return "00:00:00 (Expired)";
+            return "00:00:00";
           }
           const totalSeconds = Math.floor(diffMs / 1000);
           const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
@@ -1432,17 +1438,17 @@
                     ></span>
                   </div>
 
-                  <table class="relative z-10 min-w-full border-separate border-spacing-0">
+                  <table class="relative z-10 w-full border-separate border-spacing-0">
                     <thead>
                       <tr>
-                        <th class="border-b border-[#E2DDD3] py-3.5 pr-4 pl-5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Ticket</th>
-                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Requester</th>
-                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Priority</th>
-                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Description</th>
-                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Countdown</th>
-                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Status</th>
-                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Logged</th>
-                        <th class="border-b border-[#E2DDD3] py-3.5 pr-4 pl-4 text-right font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Resolution</th>
+                        <th class="border-b border-[#E2DDD3] py-3.5 pr-3 pl-4 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Ticket</th>
+                        <th class="border-b border-[#E2DDD3] px-3 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Requester</th>
+                        <th class="border-b border-[#E2DDD3] px-3 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Priority</th>
+                        <th class="border-b border-[#E2DDD3] px-3 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Description</th>
+                        <th class="border-b border-[#E2DDD3] px-3 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Countdown</th>
+                        <th class="border-b border-[#E2DDD3] px-3 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Status</th>
+                        <th class="border-b border-[#E2DDD3] px-3 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Logged</th>
+                        <th class="border-b border-[#E2DDD3] py-3.5 pr-4 pl-3 text-right font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Resolution</th>
                       </tr>
                     </thead>
                     <tbody
@@ -1462,13 +1468,13 @@
                           @mouseenter="move($event.currentTarget, t.status)"
                           class="stagger-row tilt-row group"
                         >
-                          <td class="border-b border-[#E2DDD3]/75 py-5 pr-4 pl-5 font-mono text-xs text-[#6E6A61] tabular-nums dark:border-[#2C2B27]/80 dark:text-[#9B968B]">
+                          <td class="border-b border-[#E2DDD3]/75 py-5 pr-3 pl-4 font-mono text-xs whitespace-nowrap text-[#6E6A61] tabular-nums dark:border-[#2C2B27]/80 dark:text-[#9B968B]">
                             <div class="depth-cell" x-text="`TCK-${String(t.id).padStart(2, '0')}`"></div>
                           </td>
-                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 font-mono text-xs text-[#6E6A61] dark:border-[#2C2B27]/80 dark:text-[#9B968B]">
+                          <td class="border-b border-[#E2DDD3]/75 px-3 py-5 font-mono text-xs text-[#6E6A61] dark:border-[#2C2B27]/80 dark:text-[#9B968B]">
                             <div class="depth-cell" x-text="t.user_discord_id"></div>
                           </td>
-                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 text-xs dark:border-[#2C2B27]/80">
+                          <td class="border-b border-[#E2DDD3]/75 px-3 py-5 text-xs whitespace-nowrap dark:border-[#2C2B27]/80">
                             <div class="depth-cell-deep inline-flex items-center gap-2 font-mono text-xs font-medium" :class="statusTextClass(t.priority || 'Necessary')">
                               <span
                                 class="status-dot-pulse h-1.5 w-1.5 rounded-full"
@@ -1478,17 +1484,17 @@
                               <span x-text="t.priority || 'Necessary'"></span>
                             </div>
                           </td>
-                          <td class="max-w-md border-b border-[#E2DDD3]/75 px-4 py-5 text-sm leading-relaxed text-[#1C1B18] dark:border-[#2C2B27]/80 dark:text-[#EAE6DD]">
+                          <td class="max-w-xs border-b border-[#E2DDD3]/75 px-3 py-5 text-sm leading-relaxed text-[#1C1B18] dark:border-[#2C2B27]/80 dark:text-[#EAE6DD]">
                             <div class="depth-cell-deep" x-text="t.issue_description"></div>
                           </td>
-                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 font-mono text-xs tabular-nums dark:border-[#2C2B27]/80">
+                          <td class="border-b border-[#E2DDD3]/75 px-3 py-5 font-mono text-xs whitespace-nowrap tabular-nums dark:border-[#2C2B27]/80">
                             <div
                               class="depth-cell font-medium"
                               :class="t.status === 'Expired' ? 'text-[#8B2635] dark:text-[#D47A86]' : (t.status === 'Solved' || t.status === 'Resolved' ? 'text-[#2E6F50] dark:text-[#6EB38E]' : 'text-[#1C1B18] dark:text-[#EAE6DD]')"
                               x-text="formatTicketCountdown(t)"
                             ></div>
                           </td>
-                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 text-sm dark:border-[#2C2B27]/80">
+                          <td class="border-b border-[#E2DDD3]/75 px-3 py-5 text-sm whitespace-nowrap dark:border-[#2C2B27]/80">
                             <div class="depth-cell-deep inline-flex items-center gap-2 text-xs font-medium" :class="statusTextClass(t.status)">
                               <span
                                 class="status-dot-pulse h-1.5 w-1.5 rounded-full"
@@ -1499,16 +1505,16 @@
                             </div>
                           </td>
                           <td
-                            class="border-b border-[#E2DDD3]/75 px-4 py-5 font-mono text-xs text-[#6E6A61] dark:border-[#2C2B27]/80 dark:text-[#9B968B]"
+                            class="border-b border-[#E2DDD3]/75 px-3 py-5 font-mono text-xs whitespace-nowrap text-[#6E6A61] dark:border-[#2C2B27]/80 dark:text-[#9B968B]"
                             :title="formatExactDate(t.created_at)"
                           >
                             <div class="depth-cell" x-text="formatRelativeTime(t.created_at)"></div>
                           </td>
-                          <td class="border-b border-[#E2DDD3]/75 py-5 pr-4 pl-4 text-right text-xs whitespace-nowrap dark:border-[#2C2B27]/80">
-                            <div class="depth-cell-deep inline-flex items-center gap-4 opacity-50 transition-opacity duration-200 group-hover:opacity-100 max-sm:opacity-100">
+                          <td class="border-b border-[#E2DDD3]/75 py-5 pr-4 pl-3 text-right text-xs whitespace-nowrap dark:border-[#2C2B27]/80">
+                            <div class="depth-cell-deep inline-flex items-center gap-3 opacity-50 transition-opacity duration-200 group-hover:opacity-100 max-sm:opacity-100">
                               <button
                                 type="button"
-                                x-show="t.status !== 'In-Progress' && t.status !== 'Solved' && t.status !== 'Resolved'"
+                                x-show="t.status === 'Open'"
                                 @click="updateTicketStatus(t.id, 'In-Progress')"
                                 class="font-medium text-[#3B5B75] hover:underline dark:text-[#84A8C4]"
                               >
