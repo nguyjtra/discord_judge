@@ -30,7 +30,7 @@ Submitting Solution:
 ### 2. AI Error Explanation
 1. Request: User types \*explain [submission_id] after a failed submission.
 2. Slice Error Lines: FastAPI reads the saved error traceback, finds the exact error line number, and extracts only 5 lines of code (2 lines above, the error line, and 2 lines below), cutting code input by 80%–90% on 25–50 line submissions.
-3. AI Response: Gemini explains the cause of the error in English and replies on Discord with how to fix it.
+3. AI Response: Gemini explains the cause of the error and replies on Discord with how to fix it.
 
 ![Runtime Error and AI Explanation on Discord](./FE/asset/images/error+AIsupport.png)
 
