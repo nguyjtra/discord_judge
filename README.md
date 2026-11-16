@@ -49,11 +49,11 @@ A web and Discord application that lets users view coding problems, submit Pytho
 
 2. **AI Error Helper (`app/services/ai_service.py`):**
    - Reads the Python error traceback to find the exact line number that crashed.
-   - Cuts AI code input by **80%–90% on 25–50 line submissions** by extracting only a **5-line code snippet** (`2 lines before`, `the error line`, and `2 lines after`) to send to the `gemini-3.5-flash-lite` model instead of sending the whole file.
+   - Cuts AI code input by 80%–90% on 25–50 line submissions by extracting 5-line code snippet (`2 lines before`, `the error line`, and `2 lines after`) to send to the `gemini-3.5-flash-lite` model instead of sending the whole file.
    - For `Wrong Answer` submissions, attaches the failed Test Case `Input`, `Your Output`, and `Expected Output` so the AI can explain the logic mistake.
 
 3. **IT Support Tickets with Countdown & Email (`app/api/endpoints/tickets.py`):**
-   - Users report issues from Discord using interactive buttons with **2 priority levels**:
+   - Users report issues from Discord using interactive buttons with 2 priority levels:
      - **Priority (System / API):** `15-minute` countdown timer.
      - **Necessary (Problem / Code):** `3-hour` countdown timer.
    - The Admin web page updates the countdown every `1 second` and automatically changes the ticket status from `Open` / `In-Progress` to `Expired` when time runs out.
