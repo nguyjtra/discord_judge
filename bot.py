@@ -122,7 +122,7 @@ async def explain(ctx, submission_id: int):
 async def ticket(ctx, *, description: str):
     view = TicketPriorityView(user_id=str(ctx.author.id), description=description)
     await ctx.send(
-        f"📋 **Please select the priority level for your issue:**\n> {description}",
+        f"**Please select the priority level for your issue:**\n> {description}",
         view=view
     )
 
