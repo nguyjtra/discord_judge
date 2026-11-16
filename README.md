@@ -18,6 +18,60 @@ flowchart LR
 
 ---
 
+## Database Schema (ER Diagram)
+
+- **`problems` (1) $\rightarrow$ (N) `test_cases`**: One coding problem has multiple test cases (`problem_id` Foreign Key).
+- **`problems` (1) $\rightarrow$ (N) `submissions`**: One coding problem receives multiple user code submissions (`problem_id` Foreign Key).
+- **`tickets`**: Standalone table storing IT support issues reported by Discord users with countdown deadlines.
+
+```mermaid
+erDiagram
+    PROBLEMS ||--o{ TEST_CASES : "has"
+    PROBLEMS ||--o{ SUBMISSIONS : "receives"
+
+    PROBLEMS {
+        int id PK
+        varchar title
+        text description
+        float time_limit "Default: 1.0s"
+        int memory_limit "Default: 256MB"
+        varchar difficulty "Easy / Medium / Hard"
+    }
+
+    TEST_CASES {
+        int id PK
+        int problem_id FK
+        text input_data
+        text expected_output
+    }
+
+    SUBMISSIONS {
+        int id PK
+        varchar user_discord_id
+        int problem_id FK
+        text source_code
+        varchar language
+        varchar status "Pending / Judging / Accepted / Wrong Answer / TLE / Runtime Error"
+        float runtime
+        float memory
+        text error_message
+        datetime created_at
+    }
+
+    TICKETS {
+        int id PK
+        varchar user_discord_id
+        text issue_description
+        varchar priority "Priority (15m) / Necessary (3h)"
+        varchar status "Open / In-Progress / Solved / Expired"
+        datetime created_at
+        datetime deadline
+        datetime closed_at
+    }
+```
+
+---
+
 ## Main Features (With Exact Specs)
 
 1. **Docker Code Sandbox (`app/workers/sandbox_worker.py`):**
@@ -26,7 +80,7 @@ flowchart LR
 
 2. **AI Error Helper (`app/services/ai_service.py`):**
    - Reads the Python error traceback to find the exact line number that crashed.
-   - Extracts only a **5-line code snippet** (`2 lines above`, `the error line`, and `2 lines below`) to send to the `gemini-3.5-flash-lite` model instead of sending the whole file.
+   - Cuts AI code input by **80%–90% on 25–50 line submissions** by extracting only a **5-line code snippet** (`2 lines before`, `the error line`, and `2 lines after`) to send to the `gemini-3.5-flash-lite` model instead of sending the whole file.
    - For `Wrong Answer` submissions, attaches the failed Test Case `Input`, `Your Output`, and `Expected Output` so the AI can explain the logic mistake.
 
 3. **IT Support Tickets with Countdown & Email (`app/api/endpoints/tickets.py`):**
