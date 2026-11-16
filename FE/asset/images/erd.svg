@@ -111,30 +111,30 @@
 
   <!-- ==================== TABLE 4: TICKETS (Standalone) ==================== -->
   <g transform="translate(40, 305)">
-    <rect width="310" height="190" rx="6" fill="#1B1B19" stroke="#84A8C4" stroke-width="1.5"/>
-    <rect width="310" height="34" rx="6" fill="#1D252C"/>
+    <rect width="340" height="190" rx="6" fill="#1B1B19" stroke="#84A8C4" stroke-width="1.5"/>
+    <rect width="340" height="34" rx="6" fill="#1D252C"/>
     <text x="14" y="22" fill="#84A8C4" font-size="13" font-weight="bold">tickets (IT Support SLA)</text>
 
     <text x="14" y="56" fill="#D4A362" font-size="12" font-weight="bold">PK</text>
     <text x="44" y="56" fill="#EAE6DD" font-size="12">id</text>
-    <text x="185" y="56" fill="#9B968B" font-size="11">INT</text>
+    <text x="205" y="56" fill="#9B968B" font-size="11">INT</text>
 
     <text x="44" y="78" fill="#EAE6DD" font-size="12">user_discord_id</text>
-    <text x="185" y="78" fill="#9B968B" font-size="11">VARCHAR(50)</text>
+    <text x="205" y="78" fill="#9B968B" font-size="11">VARCHAR(50)</text>
 
     <text x="44" y="100" fill="#EAE6DD" font-size="12">issue_description</text>
-    <text x="185" y="100" fill="#9B968B" font-size="11">TEXT</text>
+    <text x="205" y="100" fill="#9B968B" font-size="11">TEXT</text>
 
     <text x="44" y="122" fill="#EAE6DD" font-size="12">priority</text>
-    <text x="185" y="122" fill="#9B968B" font-size="11">15m / 3h</text>
+    <text x="205" y="122" fill="#9B968B" font-size="11">15m / 3h</text>
 
     <text x="44" y="144" fill="#EAE6DD" font-size="12">status</text>
-    <text x="185" y="144" fill="#9B968B" font-size="11">Open/Solved/Expired</text>
+    <text x="205" y="144" fill="#9B968B" font-size="11">Open/Solved/Expired</text>
 
     <text x="44" y="166" fill="#EAE6DD" font-size="12">created_at / deadline</text>
-    <text x="185" y="166" fill="#9B968B" font-size="11">DATETIME</text>
+    <text x="205" y="166" fill="#9B968B" font-size="11">DATETIME</text>
 
     <text x="44" y="184" fill="#EAE6DD" font-size="12">closed_at</text>
-    <text x="185" y="184" fill="#9B968B" font-size="11">DATETIME</text>
+    <text x="205" y="184" fill="#9B968B" font-size="11">DATETIME</text>
   </g>
 </svg>
