@@ -13,6 +13,54 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='*', intents=intents)
 
+
+class TicketPriorityView(discord.ui.View):
+    def __init__(self, user_id: str, description: str):
+        super().__init__(timeout=60)
+        self.user_id = user_id
+        self.description = description
+
+    async def gui_ticket(self, interaction: discord.Interaction, priority: str, thoi_gian: str):
+        if str(interaction.user.id) != self.user_id:
+            await interaction.response.send_message("Only the person who typed the command can select this.", ephemeral=True)
+            return
+
+        du_lieu = {
+            "user_discord_id": self.user_id,
+            "issue_description": self.description,
+            "priority": priority
+        }
+
+        try:
+            ket_qua = requests.post(f"{API_URL}/tickets/", json=du_lieu)
+            if ket_qua.status_code == 200:
+                ticket_id = ket_qua.json().get("id")
+                for item in self.children:
+                    item.disabled = True
+                await interaction.response.edit_message(
+                    content=(
+                        f"✅ **Ticket Created:** `TICKET-#{ticket_id}`\n"
+                        f"- **Category:** {priority}\n"
+                        f"- **Countdown:** {thoi_gian}\n"
+                        f"- **Issue:** {self.description}\n"
+                        f"*(An email notification has been sent to the Admin)*"
+                    ),
+                    view=self
+                )
+            else:
+                await interaction.response.send_message("System Error when creating ticket.", ephemeral=True)
+        except Exception:
+            await interaction.response.send_message("Server connection error.", ephemeral=True)
+
+    @discord.ui.button(label="Priority: System / API (15 mins)", style=discord.ButtonStyle.danger)
+    async def chon_priority(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.gui_ticket(interaction, "Priority", "15 minutes")
+
+    @discord.ui.button(label="Necessary: Problem / Code (3 hours)", style=discord.ButtonStyle.primary)
+    async def chon_necessary(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.gui_ticket(interaction, "Necessary", "3 hours")
+
+
 @bot.event
 async def on_ready():
     print("let coding!!!")
@@ -72,24 +120,11 @@ async def explain(ctx, submission_id: int):
 
 @bot.command()
 async def ticket(ctx, *, description: str):
-    await ctx.send("Sending...")
-    
-    du_lieu = {
-        "user_discord_id": str(ctx.author.id),
-        "issue_description": description
-    }
-    
-    try:
-        ket_qua = requests.post(f"{API_URL}/tickets/", json=du_lieu)
-        
-        if ket_qua.status_code == 200:
-            ticket_id = ket_qua.json().get("id")
-            await ctx.send(f"Your Ticket number is `TICKET-#{ticket_id}`.")
-        else:
-            await ctx.send("System Error")
-            
-    except Exception as e:
-        await ctx.send("Router problem")
+    view = TicketPriorityView(user_id=str(ctx.author.id), description=description)
+    await ctx.send(
+        f"📋 **Please select the priority level for your issue:**\n> {description}",
+        view=view
+    )
 
 @bot.command(name='problems')
 async def list_problems(ctx):

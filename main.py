@@ -39,8 +39,17 @@ app.include_router(tickets.router, prefix="/api/tickets", tags=["Tickets"])
 def startup_db():
     try:
         Base.metadata.create_all(bind=engine)
-        with engine.connect() as connection:
-            print("🎉 MYSQL THÀNH CÔNG!")
+        inspector = inspect(engine)
+        if "tickets" in inspector.get_table_names():
+            columns = [col["name"] for col in inspector.get_columns("tickets")]
+            with engine.begin() as conn:
+                if "priority" not in columns:
+                    conn.execute(text("ALTER TABLE tickets ADD COLUMN priority VARCHAR(50) DEFAULT 'Necessary'"))
+                if "deadline" not in columns:
+                    conn.execute(text("ALTER TABLE tickets ADD COLUMN deadline DATETIME NULL"))
+                conn.execute(text("ALTER TABLE tickets MODIFY COLUMN status VARCHAR(50) DEFAULT 'Open'"))
+                conn.execute(text("UPDATE tickets SET deadline = DATE_ADD(created_at, INTERVAL 3 HOUR) WHERE deadline IS NULL"))
+        print("🎉 MYSQL THÀNH CÔNG!")
     except Exception as e:
         print("❌ Lỗi rồi:", e)
 

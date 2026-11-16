@@ -443,12 +443,16 @@
       const STATUS_TONE_LOOKUP = {
         accepted: "emerald",
         resolved: "emerald",
+        solved: "emerald",
         easy: "sage",
         pending: "ochre",
         judging: "ochre",
         open: "ochre",
         medium: "ochre",
         "in-progress": "steel",
+        necessary: "steel",
+        priority: "burgundy",
+        expired: "burgundy",
         "wrong answer": "burgundy",
         tle: "burgundy",
         "runtime error": "burgundy",
@@ -595,8 +599,12 @@
         ticketModalOpen: false,
         ticketForm: {
           user_discord_id: "admin",
+          priority: "Necessary",
           issue_description: "",
         },
+
+        nowTick: Date.now(),
+        _expiringIds: {},
 
         // View Submission Modal
         submissionModalOpen: false,
@@ -609,6 +617,44 @@
             localStorage.setItem("darkMode", JSON.stringify(value));
           });
           this.fetchAllData({ animate: true });
+          setInterval(() => {
+            this.nowTick = Date.now();
+            this.checkExpiredTickets();
+          }, 1000);
+        },
+
+        checkExpiredTickets() {
+          this.tickets.forEach((t) => {
+            if (t.status !== "Open" && t.status !== "In-Progress") return;
+            const deadlineDate = this.parseUtcDate(t.deadline);
+            if (!deadlineDate) return;
+            if (this.nowTick >= deadlineDate.getTime() && !this._expiringIds[t.id]) {
+              this._expiringIds[t.id] = true;
+              t.status = "Expired";
+              this.updateTicketStatus(t.id, "Expired");
+            }
+          });
+        },
+
+        formatTicketCountdown(t) {
+          void this.nowTick;
+          if (t.status === "Solved" || t.status === "Resolved") {
+            return "Solved ✓";
+          }
+          if (t.status === "Expired") {
+            return "00:00:00 (Expired)";
+          }
+          const deadlineDate = this.parseUtcDate(t.deadline);
+          if (!deadlineDate) return "—";
+          const diffMs = deadlineDate.getTime() - this.nowTick;
+          if (diffMs <= 0) {
+            return "00:00:00 (Expired)";
+          }
+          const totalSeconds = Math.floor(diffMs / 1000);
+          const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+          const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+          const seconds = String(totalSeconds % 60).padStart(2, "0");
+          return `${hours}:${minutes}:${seconds}`;
         },
 
         showToast(msg) {
@@ -692,7 +738,9 @@
         },
 
         get openTicketsCount() {
-          return this.tickets.filter((t) => t.status !== "Resolved").length;
+          return this.tickets.filter(
+            (t) => t.status !== "Resolved" && t.status !== "Solved"
+          ).length;
         },
 
         get acceptedSubmissionsCount() {
@@ -1347,7 +1395,8 @@
                       { key: 'ALL', label: `All (${tickets.length})` },
                       { key: 'Open', label: 'Open' },
                       { key: 'In-Progress', label: 'In-Progress' },
-                      { key: 'Resolved', label: 'Resolved' }
+                      { key: 'Solved', label: 'Solved' },
+                      { key: 'Expired', label: 'Expired' }
                     ]"
                     :key="tab.key"
                   >
@@ -1388,7 +1437,9 @@
                       <tr>
                         <th class="border-b border-[#E2DDD3] py-3.5 pr-4 pl-5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Ticket</th>
                         <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Requester</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Priority</th>
                         <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Description</th>
+                        <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Countdown</th>
                         <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Status</th>
                         <th class="border-b border-[#E2DDD3] px-4 py-3.5 text-left font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Logged</th>
                         <th class="border-b border-[#E2DDD3] py-3.5 pr-4 pl-4 text-right font-mono text-[11px] font-medium tracking-[0.12em] text-[#6E6A61] uppercase dark:border-[#2C2B27] dark:text-[#9B968B]">Resolution</th>
@@ -1400,7 +1451,7 @@
                     >
                       <template x-if="filteredTickets.length === 0">
                         <tr>
-                          <td colspan="6" class="px-4 py-14 text-center text-sm text-[#6E6A61] dark:text-[#9B968B]">
+                          <td colspan="8" class="px-4 py-14 text-center text-sm text-[#6E6A61] dark:text-[#9B968B]">
                             No support tickets in this view.
                           </td>
                         </tr>
@@ -1417,8 +1468,25 @@
                           <td class="border-b border-[#E2DDD3]/75 px-4 py-5 font-mono text-xs text-[#6E6A61] dark:border-[#2C2B27]/80 dark:text-[#9B968B]">
                             <div class="depth-cell" x-text="t.user_discord_id"></div>
                           </td>
+                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 text-xs dark:border-[#2C2B27]/80">
+                            <div class="depth-cell-deep inline-flex items-center gap-2 font-mono text-xs font-medium" :class="statusTextClass(t.priority || 'Necessary')">
+                              <span
+                                class="status-dot-pulse h-1.5 w-1.5 rounded-full"
+                                :class="statusDotClass(t.priority || 'Necessary')"
+                                :style="statusDotStyle(t.priority || 'Necessary')"
+                              ></span>
+                              <span x-text="t.priority || 'Necessary'"></span>
+                            </div>
+                          </td>
                           <td class="max-w-md border-b border-[#E2DDD3]/75 px-4 py-5 text-sm leading-relaxed text-[#1C1B18] dark:border-[#2C2B27]/80 dark:text-[#EAE6DD]">
                             <div class="depth-cell-deep" x-text="t.issue_description"></div>
+                          </td>
+                          <td class="border-b border-[#E2DDD3]/75 px-4 py-5 font-mono text-xs tabular-nums dark:border-[#2C2B27]/80">
+                            <div
+                              class="depth-cell font-medium"
+                              :class="t.status === 'Expired' ? 'text-[#8B2635] dark:text-[#D47A86]' : (t.status === 'Solved' || t.status === 'Resolved' ? 'text-[#2E6F50] dark:text-[#6EB38E]' : 'text-[#1C1B18] dark:text-[#EAE6DD]')"
+                              x-text="formatTicketCountdown(t)"
+                            ></div>
                           </td>
                           <td class="border-b border-[#E2DDD3]/75 px-4 py-5 text-sm dark:border-[#2C2B27]/80">
                             <div class="depth-cell-deep inline-flex items-center gap-2 text-xs font-medium" :class="statusTextClass(t.status)">
@@ -1440,7 +1508,7 @@
                             <div class="depth-cell-deep inline-flex items-center gap-4 opacity-50 transition-opacity duration-200 group-hover:opacity-100 max-sm:opacity-100">
                               <button
                                 type="button"
-                                x-show="t.status !== 'In-Progress'"
+                                x-show="t.status !== 'In-Progress' && t.status !== 'Solved' && t.status !== 'Resolved'"
                                 @click="updateTicketStatus(t.id, 'In-Progress')"
                                 class="font-medium text-[#3B5B75] hover:underline dark:text-[#84A8C4]"
                               >
@@ -1448,16 +1516,16 @@
                               </button>
                               <button
                                 type="button"
-                                x-show="t.status !== 'Resolved'"
-                                @click="updateTicketStatus(t.id, 'Resolved')"
+                                x-show="t.status !== 'Solved' && t.status !== 'Resolved'"
+                                @click="updateTicketStatus(t.id, 'Solved')"
                                 class="font-medium text-[#2E6F50] hover:underline dark:text-[#6EB38E]"
                               >
-                                Resolve
+                                Solved
                               </button>
                               <button
                                 type="button"
-                                x-show="t.status === 'Resolved'"
-                                @click="updateTicketStatus(t.id, 'Open')"
+                                x-show="t.status === 'Solved' || t.status === 'Resolved' || t.status === 'Expired'"
+                                @click="delete _expiringIds[t.id]; updateTicketStatus(t.id, 'Open')"
                                 class="font-medium text-[#6E6A61] hover:text-[#1C1B18] dark:text-[#9B968B] dark:hover:text-[#EAE6DD]"
                               >
                                 Reopen
@@ -1832,6 +1900,18 @@
               x-model="ticketForm.user_discord_id"
               class="w-full border border-[#D7D1C5] bg-transparent px-3.5 py-2.5 text-sm text-[#1C1B18] focus:border-[#1C1B18] focus:outline-none dark:border-[#2C2B27] dark:text-[#EAE6DD]"
             />
+          </div>
+          <div>
+            <label class="mb-1.5 block font-mono text-[11px] tracking-wider text-[#6E6A61] uppercase dark:text-[#9B968B]">
+              Priority &amp; Countdown
+            </label>
+            <select
+              x-model="ticketForm.priority"
+              class="w-full border border-[#D7D1C5] bg-[#FBF9F5] px-3.5 py-2.5 text-sm text-[#1C1B18] focus:border-[#1C1B18] focus:outline-none dark:border-[#2C2B27] dark:bg-[#141413] dark:text-[#EAE6DD]"
+            >
+              <option value="Priority">Priority — System / API (15 minutes)</option>
+              <option value="Necessary">Necessary — Problem / Code (3 hours)</option>
+            </select>
           </div>
           <div>
             <label class="mb-1.5 block font-mono text-[11px] tracking-wider text-[#6E6A61] uppercase dark:text-[#9B968B]">
