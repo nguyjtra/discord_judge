@@ -5,23 +5,23 @@ import time
 
 client = docker.from_env()
 
-def run_python_code(source_code: str, input_data: str = "", memory_limit: str = "256m"):
-    with tempfile.TemporaryDirectory() as thu_muc_tam:
-        duong_dan_file_code = os.path.join(thu_muc_tam, "main.py")
-        with open(duong_dan_file_code, "w") as file_code:
-            file_code.write(source_code)
+def run_python_code(source_code: str, input_data: str = "", time_limit: float = 2.0, memory_limit: str = "256m"):
+    with tempfile.TemporaryDirectory() as temp_dir:
+        code_file_path = os.path.join(temp_dir, "main.py")
+        with open(code_file_path, "w") as code_file:
+            code_file.write(source_code)
             
-        duong_dan_file_input = os.path.join(thu_muc_tam, "input.txt")
-        with open(duong_dan_file_input, "w") as file_input:
-            file_input.write(input_data)
+        input_file_path = os.path.join(temp_dir, "input.txt")
+        with open(input_file_path, "w") as input_file:
+            input_file.write(input_data)
         
         try:
-            bat_dau_bam_gio = time.time()
+            start_time = time.time()
             
-            hop_cat = client.containers.run(
+            container = client.containers.run(
                 image="python:3.12-alpine",
                 command='sh -c "python /app/main.py < /app/input.txt"',
-                volumes={thu_muc_tam: {'bind': '/app', 'mode': 'ro'}},
+                volumes={temp_dir: {'bind': '/app', 'mode': 'ro'}},
                 working_dir="/app",
                 mem_limit=memory_limit,
                 network_disabled=True,
@@ -29,25 +29,32 @@ def run_python_code(source_code: str, input_data: str = "", memory_limit: str = 
             )
             
             try:
-                ket_qua_thi = hop_cat.wait()
-                thoi_gian_lam_bai = round(time.time() - bat_dau_bam_gio, 3)
+                try:
+                    wait_result = container.wait(timeout=time_limit)
+                except Exception:
+                    return {
+                        "status": "TLE",
+                        "output": f"Time Limit Exceeded ({time_limit}s)",
+                        "runtime": round(time_limit, 3)
+                    }
+
+                elapsed_time = round(time.time() - start_time, 3)
+                raw_logs = container.logs()
                 
-                du_lieu_in_ra = hop_cat.logs()
-                
-                if du_lieu_in_ra:
-                    chuoi_ket_qua = du_lieu_in_ra.decode("utf-8").strip()
+                if raw_logs:
+                    output_text = raw_logs.decode("utf-8").strip()
                 else:
-                    chuoi_ket_qua = ""
+                    output_text = ""
                 
-                ma_loi = ket_qua_thi.get("StatusCode", 0)
+                exit_code = wait_result.get("StatusCode", 0)
                 
-                if ma_loi == 0:
-                    return {"status": "Success", "output": chuoi_ket_qua, "runtime": thoi_gian_lam_bai}
+                if exit_code == 0:
+                    return {"status": "Success", "output": output_text, "runtime": elapsed_time}
                 else:
-                    return {"status": "Runtime Error", "output": chuoi_ket_qua, "runtime": thoi_gian_lam_bai}
+                    return {"status": "Runtime Error", "output": output_text, "runtime": elapsed_time}
                     
             finally:
-                hop_cat.remove(force=True)
+                container.remove(force=True)
                 
-        except Exception as loi_he_thong:
-            return {"status": "System Error", "output": f"Lỗi hệ thống: {str(loi_he_thong)}", "runtime": 0}
+        except Exception as system_error:
+            return {"status": "System Error", "output": f"System Error: {str(system_error)}", "runtime": 0}

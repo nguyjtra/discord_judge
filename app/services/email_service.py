@@ -12,7 +12,7 @@ def send_ticket_email(ticket_id: int, user_discord_id: str, priority: str, descr
         smtp_password = smtp_password.replace(" ", "")
 
     if not smtp_email or not smtp_password:
-        print("Chua cau hinh SMTP_EMAIL hoac SMTP_PASSWORD trong file .env")
+        print("Missing SMTP_EMAIL or SMTP_PASSWORD in .env")
         return
 
     try:
@@ -21,7 +21,7 @@ def send_ticket_email(ticket_id: int, user_discord_id: str, priority: str, descr
         msg["From"] = smtp_email
         msg["To"] = smtp_email
 
-        noi_dung_email = (
+        email_body = (
             f"New IT Support Ticket Submitted!\n\n"
             f"- Ticket ID: #{ticket_id}\n"
             f"- Discord User ID: {user_discord_id}\n"
@@ -29,12 +29,12 @@ def send_ticket_email(ticket_id: int, user_discord_id: str, priority: str, descr
             f"- Time Limit (Countdown): {remaining_time}\n"
             f"- Issue Description:\n{description}\n"
         )
-        msg.set_content(noi_dung_email)
+        msg.set_content(email_body)
 
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
             server.login(smtp_email, smtp_password)
             server.send_message(msg)
 
-        print(f"Da gui email thong bao Ticket #{ticket_id} toi {smtp_email}")
+        print(f"Sent notification email for Ticket #{ticket_id} to {smtp_email}")
     except Exception as e:
-        print(f"Loi khi gui email: {e}")
+        print(f"Email error: {e}")

@@ -20,28 +20,28 @@ class TicketPriorityView(discord.ui.View):
         self.user_id = user_id
         self.description = description
 
-    async def gui_ticket(self, interaction: discord.Interaction, priority: str, thoi_gian: str):
+    async def submit_ticket(self, interaction: discord.Interaction, priority: str, duration_label: str):
         if str(interaction.user.id) != self.user_id:
             await interaction.response.send_message("Only the person who typed the command can select this.", ephemeral=True)
             return
 
-        du_lieu = {
+        payload = {
             "user_discord_id": self.user_id,
             "issue_description": self.description,
             "priority": priority
         }
 
         try:
-            ket_qua = requests.post(f"{API_URL}/tickets/", json=du_lieu)
-            if ket_qua.status_code == 200:
-                ticket_id = ket_qua.json().get("id")
+            response = await asyncio.to_thread(requests.post, f"{API_URL}/tickets/", json=payload)
+            if response.status_code == 200:
+                ticket_id = response.json().get("id")
                 for item in self.children:
                     item.disabled = True
                 await interaction.response.edit_message(
                     content=(
                         f"**Ticket Created:** `TICKET-#{ticket_id}`\n"
                         f"- **Category:** {priority}\n"
-                        f"- **Countdown:** {thoi_gian}\n"
+                        f"- **Countdown:** {duration_label}\n"
                         f"- **Issue:** {self.description}\n"
                         f"*(An email notification has been sent to the Admin)*"
                     ),
@@ -53,17 +53,17 @@ class TicketPriorityView(discord.ui.View):
             await interaction.response.send_message("Server connection error.", ephemeral=True)
 
     @discord.ui.button(label="Priority: System / API (15 mins)", style=discord.ButtonStyle.danger)
-    async def chon_priority(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await self.gui_ticket(interaction, "Priority", "15 minutes")
+    async def select_priority(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.submit_ticket(interaction, "Priority", "15 minutes")
 
     @discord.ui.button(label="Necessary: Problem / Code (3 hours)", style=discord.ButtonStyle.primary)
-    async def chon_necessary(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await self.gui_ticket(interaction, "Necessary", "3 hours")
+    async def select_necessary(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.submit_ticket(interaction, "Necessary", "3 hours")
 
 
 @bot.event
 async def on_ready():
-    print("let coding!!!")
+    print("Discord Judge Bot is online.")
 
 @bot.command()
 async def submit(ctx, problem_id: int, *, code: str):
@@ -73,30 +73,30 @@ async def submit(ctx, problem_id: int, *, code: str):
     if clean_code.startswith("python"):
         clean_code = clean_code[6:].strip()
 
-    du_lieu = {
+    payload = {
         "user_discord_id": str(ctx.author.id), 
         "problem_id": problem_id,
         "source_code": clean_code,
         "language": "python"
     }
     
-    ket_qua = requests.post(f"{API_URL}/submissions/", json=du_lieu)
-    if ket_qua.status_code == 200:
-        ma_bai_nop = ket_qua.json().get("id")
-        await ctx.send(f"Success! The submission ID is: {ma_bai_nop}")
+    response = await asyncio.to_thread(requests.post, f"{API_URL}/submissions/", json=payload)
+    if response.status_code == 200:
+        submission_id = response.json().get("id")
+        await ctx.send(f"Success! The submission ID is: {submission_id}")
         for _ in range(15):
             await asyncio.sleep(2)
-            check = requests.get(f"{API_URL}/submissions/{ma_bai_nop}")
+            check = await asyncio.to_thread(requests.get, f"{API_URL}/submissions/{submission_id}")
             if check.status_code == 200:
-                trang_thai = check.json().get("status")
-                if trang_thai not in ("Pending", "Judging", "PENDING", "JUDGING"):
+                status = check.json().get("status")
+                if status not in ("Pending", "Judging", "PENDING", "JUDGING"):
                     user_tag = f"<@{ctx.author.id}>"
-                    if trang_thai in ("Accepted", "ACCEPTED"):
-                        await ctx.send(f"{user_tag} **#{ma_bai_nop}**: **ACCEPTED**")
-                    elif trang_thai in ("Wrong Answer", "WRONG_ANSWER"):
-                        await ctx.send(f"{user_tag} **#{ma_bai_nop}**: **WRONG ANSWER.**\n*(`*explain {ma_bai_nop}` for AI assist)*")
+                    if status in ("Accepted", "ACCEPTED"):
+                        await ctx.send(f"{user_tag} **#{submission_id}**: **ACCEPTED**")
+                    elif status in ("Wrong Answer", "WRONG_ANSWER"):
+                        await ctx.send(f"{user_tag} **#{submission_id}**: **WRONG ANSWER.**\n*(`*explain {submission_id}` for AI assist)*")
                     else:
-                        await ctx.send(f"{user_tag} **#{ma_bai_nop}**: **{trang_thai}.**\n*(`*explain {ma_bai_nop}` for AI assist)*")
+                        await ctx.send(f"{user_tag} **#{submission_id}**: **{status}.**\n*(`*explain {submission_id}` for AI assist)*")
                     return
         await ctx.send("Timeout waiting for judge result.")
     else:
@@ -106,16 +106,16 @@ async def submit(ctx, problem_id: int, *, code: str):
 async def explain(ctx, submission_id: int):
     await ctx.send(f"AI support #{submission_id}...")
     try:
-        ket_qua = requests.get(f"{API_URL}/submissions/{submission_id}/explain")
-        if ket_qua.status_code == 200:
-            data = ket_qua.json()
-            noi_dung = data.get("ai_explanation") or data.get("message") or "No response from AI."
-            if len(noi_dung) > 1900:
-                noi_dung = noi_dung[:1900] + "\n...(truncated)"
-            await ctx.send(noi_dung)
+        response = await asyncio.to_thread(requests.get, f"{API_URL}/submissions/{submission_id}/explain")
+        if response.status_code == 200:
+            data = response.json()
+            explanation = data.get("ai_explanation") or data.get("message") or "No response from AI."
+            if len(explanation) > 1900:
+                explanation = explanation[:1900] + "\n...(truncated)"
+            await ctx.send(explanation)
         else:
-            await ctx.send(f"Error (HTTP {ket_qua.status_code})")
-    except Exception as e:
+            await ctx.send(f"Error (HTTP {response.status_code})")
+    except Exception:
         await ctx.send("Server connection error.")
 
 @bot.command()
@@ -130,7 +130,7 @@ async def ticket(ctx, *, description: str):
 async def list_problems(ctx):
     await ctx.send("Loading problems...")
     try:
-        response = requests.get(f"{API_URL}/problems/")
+        response = await asyncio.to_thread(requests.get, f"{API_URL}/problems/")
         if response.status_code == 200:
             problem_list = response.json()
             if not problem_list:
@@ -144,24 +144,24 @@ async def list_problems(ctx):
             await ctx.send(msg)
         else:
             await ctx.send("Failed to get data from server.")
-    except Exception as e:
+    except Exception:
         await ctx.send("Server connection error.")
 
 @bot.command(name='problem')
 async def show_problem(ctx, problem_id: int):
     try:
-        response = requests.get(f"{API_URL}/problems/{problem_id}")
+        response = await asyncio.to_thread(requests.get, f"{API_URL}/problems/{problem_id}")
         if response.status_code == 200:
             p = response.json()
             msg = f"**Problem {p['id']}: {p['title']}**\n"
             msg += f"**Description:**\n{p['description']}\n\n"
-            msg += f"*(Type ` *submit {p['id']} <code>` to submit your answer)*"
+            msg += f"*(Type `*submit {p['id']} <code>` to submit your answer)*"
             await ctx.send(msg)
         elif response.status_code == 404:
             await ctx.send(f"Problem #{problem_id} not found!")
         else:
             await ctx.send("Server error.")
-    except Exception as e:
+    except Exception:
         await ctx.send("Server connection error.")
 
 bot.run(TOKEN)

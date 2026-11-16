@@ -8,69 +8,69 @@ api_key = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=api_key)
 
 
-def tim_so_dong_loi(thong_bao_loi: str):
-    if not thong_bao_loi:
+def find_error_line(error_message: str):
+    if not error_message:
         return None
 
-    cac_dong_thong_bao = thong_bao_loi.splitlines()
-    so_dong_loi = None
+    lines = error_message.splitlines()
+    error_line = None
 
-    for dong in cac_dong_thong_bao:
-        if "line " in dong:
-            phan_sau_chu_line = dong.split("line ")[1]
-            chuoi_so = phan_sau_chu_line.split(",")[0].strip()
+    for line in lines:
+        if "line " in line:
+            after_line_keyword = line.split("line ")[1]
+            number_str = after_line_keyword.split(",")[0].strip()
 
-            if chuoi_so.isdigit():
-                so_dong_loi = int(chuoi_so)
+            if number_str.isdigit():
+                error_line = int(number_str)
 
-    return so_dong_loi
+    return error_line
 
 
-def lay_doan_code_loi(source_code: str, thong_bao_loi: str):
-    so_dong_loi = tim_so_dong_loi(thong_bao_loi)
+def get_error_snippet(source_code: str, error_message: str):
+    error_line = find_error_line(error_message)
 
-    if so_dong_loi is None:
+    if error_line is None:
         return source_code
 
-    danh_sach_dong = source_code.splitlines()
-    tong_so_dong = len(danh_sach_dong)
+    code_lines = source_code.splitlines()
+    total_lines = len(code_lines)
 
-    dong_bat_dau = so_dong_loi - 2
-    if dong_bat_dau < 1:
-        dong_bat_dau = 1
+    start_line = error_line - 2
+    if start_line < 1:
+        start_line = 1
 
-    dong_ket_thuc = so_dong_loi + 2
-    if dong_ket_thuc > tong_so_dong:
-        dong_ket_thuc = tong_so_dong
+    end_line = error_line + 2
+    if end_line > total_lines:
+        end_line = total_lines
 
-    doan_code_ngan = ""
-    for so_thu_tu in range(dong_bat_dau, dong_ket_thuc + 1):
-        noi_dung_dong = danh_sach_dong[so_thu_tu - 1]
+    snippet = ""
+    for line_num in range(start_line, end_line + 1):
+        line_content = code_lines[line_num - 1]
 
-        if so_thu_tu == so_dong_loi:
-            doan_code_ngan += f"--> Dòng {so_thu_tu} (BỊ LỖI): {noi_dung_dong}\n"
+        if line_num == error_line:
+            snippet += f"--> Line {line_num} (ERROR): {line_content}\n"
         else:
-            doan_code_ngan += f"    Dòng {so_thu_tu}: {noi_dung_dong}\n"
+            snippet += f"    Line {line_num}: {line_content}\n"
 
-    return doan_code_ngan
+    return snippet
 
 
 def explain_code_error(source_code: str, error_message: str = None) -> str:
     try:
-        doan_code_can_hoi = lay_doan_code_loi(source_code, error_message)
+        code_snippet = get_error_snippet(source_code, error_message)
 
         model = genai.GenerativeModel("gemini-3.5-flash-lite")
         prompt = f"""
-        Thông báo lỗi:
+        Error Output:
         {error_message}
 
-        Đoạn code cần kiểm tra:
-        {doan_code_can_hoi}
+        Code to inspect:
+        {code_snippet}
 
-        Yêu cầu:
-        - Trả lời ngắn gọn.
-        - Giải thích từng dòng trong đoạn code trên và chỉ ra cách sửa lỗi.
-        - Lưu ý: Luôn trả lời bằng tiếng Anh.
+        Instructions:
+        - Keep the answer concise.
+        - Explain each line in the snippet above and show how to fix the issue.
+        - Always respond in English.
         """
         response = model.generate_content(prompt)
         return response.text

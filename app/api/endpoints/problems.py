@@ -49,7 +49,7 @@ def get_problem_details(problem_id: int, db: Session = Depends(get_db)):
     problem = db.query(Problem).filter(Problem.id == problem_id).first()
     
     if not problem:
-        raise HTTPException(status_code=404, detail="Không tìm thấy bài tập này!")
+        raise HTTPException(status_code=404, detail="Problem not found.")
         
     return problem
 
@@ -57,7 +57,7 @@ def get_problem_details(problem_id: int, db: Session = Depends(get_db)):
 def update_problem(problem_id: int, problem_in: ProblemCreate, db: Session = Depends(get_db)):
     problem = db.query(Problem).filter(Problem.id == problem_id).first()
     if not problem:
-        raise HTTPException(status_code=404, detail="Không tìm thấy bài tập này!")
+        raise HTTPException(status_code=404, detail="Problem not found.")
 
     for key, value in problem_in.model_dump().items():
         setattr(problem, key, value)
@@ -70,13 +70,13 @@ def update_problem(problem_id: int, problem_in: ProblemCreate, db: Session = Dep
 def delete_problem(problem_id: int, db: Session = Depends(get_db)):
     problem = db.query(Problem).filter(Problem.id == problem_id).first()
     if not problem:
-        raise HTTPException(status_code=404, detail="Không tìm thấy bài tập này!")
+        raise HTTPException(status_code=404, detail="Problem not found.")
 
     db.query(TestCase).filter(TestCase.problem_id == problem_id).delete()
     db.query(Submission).filter(Submission.problem_id == problem_id).delete()
     db.delete(problem)
     db.commit()
-    return {"message": "Đã xóa bài tập thành công!"}
+    return {"message": "Problem deleted."}
 
 @router.get("/{problem_id}/test-cases", response_model=list[TestCaseResponse])
 def get_problem_test_cases(problem_id: int, db: Session = Depends(get_db)):
@@ -86,7 +86,7 @@ def get_problem_test_cases(problem_id: int, db: Session = Depends(get_db)):
 def create_test_case(problem_id: int, tc_in: TestCaseCreate, db: Session = Depends(get_db)):
     problem = db.query(Problem).filter(Problem.id == problem_id).first()
     if not problem:
-        raise HTTPException(status_code=404, detail="Không tìm thấy bài tập này!")
+        raise HTTPException(status_code=404, detail="Problem not found.")
 
     new_tc = TestCase(
         problem_id=problem_id,
@@ -102,7 +102,7 @@ def create_test_case(problem_id: int, tc_in: TestCaseCreate, db: Session = Depen
 def delete_test_case(test_case_id: int, db: Session = Depends(get_db)):
     tc = db.query(TestCase).filter(TestCase.id == test_case_id).first()
     if not tc:
-        raise HTTPException(status_code=404, detail="Không tìm thấy test case!")
+        raise HTTPException(status_code=404, detail="Test case not found.")
     db.delete(tc)
     db.commit()
-    return {"message": "Đã xóa test case!"}
+    return {"message": "Test case deleted."}

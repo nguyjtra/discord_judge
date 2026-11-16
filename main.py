@@ -59,5 +59,5 @@ def admin_dashboard():
     return HTMLResponse(content=html)
 
 @app.get("/")
-def hello_world():
-    return {"message": "Xin chao! Database đã sẵn sàng."}
+def health_check():
+    return {"message": "Discord Judge API is running."}

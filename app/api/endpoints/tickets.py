@@ -19,19 +19,19 @@ def get_db():
     finally:
         db.close()
 
-def cap_nhat_ticket_het_han(db: Session):
+def update_expired_tickets(db: Session):
     now = datetime.utcnow()
-    cac_ticket_dang_mo = db.query(Ticket).filter(
+    open_tickets = db.query(Ticket).filter(
         Ticket.status.in_(["Open", "In-Progress"])
     ).all()
 
-    co_thay_doi = False
-    for t in cac_ticket_dang_mo:
-        if t.deadline and now >= t.deadline:
-            t.status = "Expired"
-            co_thay_doi = True
+    has_changes = False
+    for ticket in open_tickets:
+        if ticket.deadline and now >= ticket.deadline:
+            ticket.status = "Expired"
+            has_changes = True
 
-    if co_thay_doi:
+    if has_changes:
         db.commit()
 
 @router.post("/", response_model=TicketResponse)
@@ -41,23 +41,23 @@ def create_ticket(
     db: Session = Depends(get_db)
 ):
     now = datetime.utcnow()
-    loai_uu_tien = ticket_in.priority or "Necessary"
+    priority_level = ticket_in.priority or "Necessary"
 
-    if loai_uu_tien == "Priority":
-        han_xu_ly = now + timedelta(minutes=15)
-        thoi_gian_chu = "15 minutes"
+    if priority_level == "Priority":
+        deadline_time = now + timedelta(minutes=15)
+        duration_label = "15 minutes"
     else:
-        loai_uu_tien = "Necessary"
-        han_xu_ly = now + timedelta(hours=3)
-        thoi_gian_chu = "3 hours"
+        priority_level = "Necessary"
+        deadline_time = now + timedelta(hours=3)
+        duration_label = "3 hours"
 
     new_ticket = Ticket(
         user_discord_id=ticket_in.user_discord_id,
         issue_description=ticket_in.issue_description,
-        priority=loai_uu_tien,
+        priority=priority_level,
         status="Open",
         created_at=now,
-        deadline=han_xu_ly
+        deadline=deadline_time
     )
     db.add(new_ticket)
     db.commit()
@@ -69,14 +69,14 @@ def create_ticket(
         new_ticket.user_discord_id,
         new_ticket.priority,
         new_ticket.issue_description,
-        thoi_gian_chu
+        duration_label
     )
 
     return new_ticket
 
 @router.get("/", response_model=list[TicketResponse])
 def get_all_tickets(db: Session = Depends(get_db)):
-    cap_nhat_ticket_het_han(db)
+    update_expired_tickets(db)
     tickets = db.query(Ticket).order_by(Ticket.id.desc()).all()
     return tickets
 
@@ -84,7 +84,7 @@ def get_all_tickets(db: Session = Depends(get_db)):
 def update_ticket_status(ticket_id: int, body: TicketStatusUpdate, db: Session = Depends(get_db)):
     ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
     if not ticket:
-        raise HTTPException(status_code=404, detail="Không tìm thấy ticket!")
+        raise HTTPException(status_code=404, detail="Ticket not found.")
 
     ticket.status = body.status
     if body.status in ("Solved", "Resolved"):
@@ -104,7 +104,7 @@ def update_ticket_status(ticket_id: int, body: TicketStatusUpdate, db: Session =
 def delete_ticket(ticket_id: int, db: Session = Depends(get_db)):
     ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
     if not ticket:
-        raise HTTPException(status_code=404, detail="Không tìm thấy ticket!")
+        raise HTTPException(status_code=404, detail="Ticket not found.")
     db.delete(ticket)
     db.commit()
-    return {"message": "Đã xóa ticket!"}
+    return {"message": "Ticket deleted."}
