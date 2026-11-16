@@ -39,7 +39,7 @@ class TicketPriorityView(discord.ui.View):
                     item.disabled = True
                 await interaction.response.edit_message(
                     content=(
-                        f"✅ **Ticket Created:** `TICKET-#{ticket_id}`\n"
+                        f"**Ticket Created:** `TICKET-#{ticket_id}`\n"
                         f"- **Category:** {priority}\n"
                         f"- **Countdown:** {thoi_gian}\n"
                         f"- **Issue:** {self.description}\n"
