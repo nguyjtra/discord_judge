@@ -1,21 +1,44 @@
-# Discord Online Judge & Incident Management Platform
+# Discord Online Judge & IT Ticket System
 
-An asynchronous coding evaluation engine and SLA-driven IT support system that enables users to browse algorithmic problems, submit and execute Python code inside isolated Docker sandboxes, receive token-optimized AI debugging assistance, and report system incidents directly from Discord.
-
----
+A web and Discord application that lets users view coding problems, submit Python code to be tested automatically inside Docker containers, get AI explanations for code errors, and submit IT support tickets with a live countdown timer.
 
 ---
 
-## Key Engineering Highlights
+## System Flow
 
-- **Containerized Code Sandboxing (`app/workers/sandbox_worker.py`):**
-  Executes untrusted user submissions inside ephemeral `python:3.12-alpine` Docker containers with network access disabled (`network_disabled=True`), strict memory caps (`256MB`), read-only bind mounts (`mode='ro'`), and hard execution timeouts (`Time Limit Exceeded / TLE` protection against infinite loops).
-- **Non-Blocking Asynchronous Evaluation (`app/services/judge_service.py`):**
-  Decouples heavy container execution and SMTP notifications from HTTP request lifecycles using FastAPI `BackgroundTasks` and non-blocking `asyncio.to_thread` calls in the Discord event loop.
-- **Token-Optimized AI Debugging (`app/services/ai_service.py`):**
-  Parses Python tracebacks to locate the exact failing line number and slices a localized 5-line window around the fault before querying Gemini, reducing prompt token consumption by up to 80% on large submissions.
-- **SLA Countdown & Incident Tracking (`app/api/endpoints/tickets.py`):**
-  Interactive Discord UI buttons classify tickets into **Priority** (`15-minute` SLA for System/API outages) or **Necessary** (`3-hour` SLA for Problem/Code issues), featuring a real-time countdown dashboard, automatic transition to `Expired` status upon SLA breach, and automated Gmail SMTP alerts.
+```mermaid
+flowchart LR
+    D[Discord Bot<br/>5 Commands] <-->|HTTP JSON| API[FastAPI Server<br/>15 REST Endpoints]
+    W[Admin Web Page] <-->|HTTP JSON| API
+    API <--> DB[(MySQL Database<br/>4 Tables)]
+    API --> DK[Docker Container<br/>256MB RAM Limit]
+    API --> AI[Gemini AI<br/>5-Line Error Snippet]
+    API --> EMAIL[Gmail SMTP<br/>Email Alert]
+```
+
+---
+
+## Main Features (With Exact Specs)
+
+1. **Docker Code Sandbox (`app/workers/sandbox_worker.py`):**
+   - Runs user-submitted Python code inside an isolated `python:3.12-alpine` Docker container.
+   - Enforces a `256MB` RAM limit, disables internet access (`network_disabled=True`), mounts files as read-only, and stops infinite loops using a `1.0s - 2.0s` execution timeout (`TLE`).
+
+2. **AI Error Helper (`app/services/ai_service.py`):**
+   - Reads the Python error traceback to find the exact line number that crashed.
+   - Extracts only a **5-line code snippet** (`2 lines above`, `the error line`, and `2 lines below`) to send to the `gemini-3.5-flash-lite` model instead of sending the whole file.
+   - For `Wrong Answer` submissions, attaches the failed Test Case `Input`, `Your Output`, and `Expected Output` so the AI can explain the logic mistake.
+
+3. **IT Support Tickets with Countdown & Email (`app/api/endpoints/tickets.py`):**
+   - Users report issues from Discord using interactive buttons with **2 priority levels**:
+     - **Priority (System / API):** `15-minute` countdown timer.
+     - **Necessary (Problem / Code):** `3-hour` countdown timer.
+   - The Admin web page updates the countdown every `1 second` and automatically changes the ticket status from `Open` / `In-Progress` to `Expired` when time runs out.
+   - Automatically sends an email alert to the Admin via Gmail SMTP (`port 465`) when a new ticket is created.
+
+4. **Database & API (`app/models/`, `app/api/endpoints/`):**
+   - **4 MySQL tables:** `problems`, `test_cases`, `submissions`, and `tickets`.
+   - **15 REST API endpoints** built with FastAPI and SQLAlchemy.
 
 ---
 
@@ -33,42 +56,40 @@ This bot was created to provide an easy way to code directly on Discord without 
 
 ## Tech Stack
 
-- **Backend:** Python 3.12, FastAPI, SQLAlchemy 2.0, Pydantic
-- **Database:** MySQL (`pymysql`)
-- **Sandbox Runtime:** Docker SDK for Python (`python:3.12-alpine`)
-- **Client & UI:** `discord.py` (Interactive Views & Buttons), Alpine.js, Tailwind CSS
-- **AI & Messaging:** Google Generative AI (`gemini-3.5-flash-lite`), Python `smtplib` (SSL)
+- **Backend:** Python 3.12, FastAPI, SQLAlchemy, Pydantic
+- **Database:** MySQL
+- **Code Runner:** Docker (`python:3.12-alpine`)
+- **Frontend & Bot:** `discord.py`, HTML, Tailwind CSS, Alpine.js
+- **External Services:** Google Gemini API, Python `smtplib` (Gmail)
 
 ---
 
-## Local Setup
+## How to Run
 
-1. **Clone the repository and create a virtual environment:**
-
+1. **Install dependencies:**
    ```bash
    python3 -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
    ```
-2. **Configure environment variables:**
-   Copy `.env.example` to `.env` and fill in your credentials:
 
+2. **Set up `.env`:**
    ```bash
    cp .env.example .env
    ```
-3. **Pull the Python sandbox image for Docker:**
 
+3. **Download Docker image:**
    ```bash
    docker pull python:3.12-alpine
    ```
-4. **Start the FastAPI server and Admin Console:**
 
+4. **Start FastAPI Server:**
    ```bash
    uvicorn main:app --reload
    ```
-   Open `http://127.0.0.1:8000/admin` to access the Admin Console.
-5. **Run the Discord Bot:**
+   Admin page: `http://127.0.0.1:8000/admin`
 
+5. **Start Discord Bot:**
    ```bash
    python bot.py
    ```
