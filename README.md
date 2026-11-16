@@ -6,7 +6,7 @@ I made a project so anyone can practice and test Python right inside Discord, ev
 
 ---
 
-## System Workflow & Live Screenshots
+## System Workflow
 
 ![System Workflow](./FE/asset/images/workflow.svg)
 
@@ -53,7 +53,7 @@ Automated Admin Email Alert:
 
 ---
 
-## Database ERD (Entity-Relationship Diagram)
+## Database ERD 
 
 ![Database ERD](./FE/asset/images/erd.svg)
 
