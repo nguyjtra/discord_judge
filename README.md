@@ -1,6 +1,6 @@
 # Discode and Ticket
 
-I built this project so users can write and test Python code directly on Discord without needing a PC or Mac. When a user submits code on Discord, my FastAPI server runs it inside an isolated Docker container and returns the result right in the chat. If the code crashes or fails a test case, users can ask AI to explain the error. I also built an IT Ticket system with a live countdown timer and Gmail alerts so I can track and fix system or problem issues from an Admin web page.
+I made a project so anyone can practice and test Python right inside Discord, even from their phone. When you drop your code in the chat, my FastAPI server spins up an isolated Docker container to run it safely and replies with the output. Stuck on a bug or failed test? You can just ask the built in AI to explain the error. I also added an IT ticket system with a live timer and Gmail alerts so I can stay on top of bugs from an admin web page.
 
 ![Admin Console Overview](./FE/asset/images/admin_img.png)
 
