@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 520" width="100%" height="100%" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace">
+  <rect width="920" height="520" rx="12" fill="#141413"/>
+
+  <!-- Title -->
+  <text x="40" y="42" fill="#EAE6DD" font-size="16" font-weight="bold" letter-spacing="1.5">ENTITY-RELATIONSHIP DIAGRAM (ERD) — DISCORD_JUDGE_DB</text>
+  <line x1="40" y1="56" x2="880" y2="56" stroke="#2C2B27" stroke-width="1.5"/>
+
+  <!-- Relationship Connectors (PROBLEMS -> TEST_CASES and PROBLEMS -> SUBMISSIONS) -->
+  <!-- Line 1: PROBLEMS.id (x=300, y=155) to TEST_CASES.problem_id (x=480, y=155) -->
+  <path d="M 300 155 L 480 155" stroke="#D4A362" stroke-width="2" fill="none"/>
+  <!-- 1 marker on PROBLEMS side -->
+  <line x1="312" y1="147" x2="312" y2="163" stroke="#D4A362" stroke-width="2"/>
+  <text x="320" y="145" fill="#D4A362" font-size="12" font-weight="bold">1</text>
+  <!-- Crow's foot (Many) on TEST_CASES side -->
+  <path d="M 465 155 L 480 147 M 465 155 L 480 163" stroke="#D4A362" stroke-width="2" fill="none"/>
+  <circle cx="460" cy="155" r="4" fill="#141413" stroke="#D4A362" stroke-width="2"/>
+  <text x="448" y="145" fill="#D4A362" font-size="12" font-weight="bold">N</text>
+
+  <!-- Line 2: PROBLEMS.id (x=300, y=195) to SUBMISSIONS.problem_id (x=480, y=340) -->
+  <path d="M 300 195 L 390 195 L 390 340 L 480 340" stroke="#6EB38E" stroke-width="2" fill="none"/>
+  <!-- 1 marker on PROBLEMS side -->
+  <line x1="312" y1="187" x2="312" y2="203" stroke="#6EB38E" stroke-width="2"/>
+  <text x="320" y="185" fill="#6EB38E" font-size="12" font-weight="bold">1</text>
+  <!-- Crow's foot (Many) on SUBMISSIONS side -->
+  <path d="M 465 340 L 480 332 M 465 340 L 480 348" stroke="#6EB38E" stroke-width="2" fill="none"/>
+  <circle cx="460" cy="340" r="4" fill="#141413" stroke="#6EB38E" stroke-width="2"/>
+  <text x="448" y="330" fill="#6EB38E" font-size="12" font-weight="bold">N</text>
+
+  <!-- ==================== TABLE 1: PROBLEMS ==================== -->
+  <g transform="translate(40, 90)">
+    <rect width="260" height="190" rx="6" fill="#1B1B19" stroke="#D4A362" stroke-width="1.5"/>
+    <rect width="260" height="34" rx="6" fill="#2A261F"/>
+    <text x="14" y="22" fill="#D4A362" font-size="13" font-weight="bold">problems</text>
+
+    <text x="14" y="56" fill="#D4A362" font-size="12" font-weight="bold">PK</text>
+    <text x="44" y="56" fill="#EAE6DD" font-size="12">id</text>
+    <text x="175" y="56" fill="#9B968B" font-size="11">INT</text>
+
+    <text x="44" y="80" fill="#EAE6DD" font-size="12">title</text>
+    <text x="175" y="80" fill="#9B968B" font-size="11">VARCHAR(255)</text>
+
+    <text x="44" y="104" fill="#EAE6DD" font-size="12">description</text>
+    <text x="175" y="104" fill="#9B968B" font-size="11">TEXT</text>
+
+    <text x="44" y="128" fill="#EAE6DD" font-size="12">time_limit</text>
+    <text x="175" y="128" fill="#9B968B" font-size="11">FLOAT (1.0)</text>
+
+    <text x="44" y="152" fill="#EAE6DD" font-size="12">memory_limit</text>
+    <text x="175" y="152" fill="#9B968B" font-size="11">INT (256)</text>
+
+    <text x="44" y="176" fill="#EAE6DD" font-size="12">difficulty</text>
+    <text x="175" y="176" fill="#9B968B" font-size="11">VARCHAR(50)</text>
+  </g>
+
+  <!-- ==================== TABLE 2: TEST_CASES ==================== -->
+  <g transform="translate(480, 90)">
+    <rect width="400" height="142" rx="6" fill="#1B1B19" stroke="#D4A362" stroke-width="1.5"/>
+    <rect width="400" height="34" rx="6" fill="#2A261F"/>
+    <text x="14" y="22" fill="#D4A362" font-size="13" font-weight="bold">test_cases</text>
+
+    <text x="14" y="56" fill="#D4A362" font-size="12" font-weight="bold">PK</text>
+    <text x="44" y="56" fill="#EAE6DD" font-size="12">id</text>
+    <text x="230" y="56" fill="#9B968B" font-size="11">INT</text>
+
+    <text x="14" y="80" fill="#84A8C4" font-size="12" font-weight="bold">FK</text>
+    <text x="44" y="80" fill="#EAE6DD" font-size="12">problem_id</text>
+    <text x="230" y="80" fill="#84A8C4" font-size="11">INT -&gt; problems.id</text>
+
+    <text x="44" y="104" fill="#EAE6DD" font-size="12">input_data</text>
+    <text x="230" y="104" fill="#9B968B" font-size="11">TEXT</text>
+
+    <text x="44" y="128" fill="#EAE6DD" font-size="12">expected_output</text>
+    <text x="230" y="128" fill="#9B968B" font-size="11">TEXT</text>
+  </g>
+
+  <!-- ==================== TABLE 3: SUBMISSIONS ==================== -->
+  <g transform="translate(480, 255)">
+    <rect width="400" height="240" rx="6" fill="#1B1B19" stroke="#6EB38E" stroke-width="1.5"/>
+    <rect width="400" height="34" rx="6" fill="#1E2B24"/>
+    <text x="14" y="22" fill="#6EB38E" font-size="13" font-weight="bold">submissions</text>
+
+    <text x="14" y="56" fill="#D4A362" font-size="12" font-weight="bold">PK</text>
+    <text x="44" y="56" fill="#EAE6DD" font-size="12">id</text>
+    <text x="230" y="56" fill="#9B968B" font-size="11">INT</text>
+
+    <text x="44" y="78" fill="#EAE6DD" font-size="12">user_discord_id</text>
+    <text x="230" y="78" fill="#9B968B" font-size="11">VARCHAR(50)</text>
+
+    <text x="14" y="100" fill="#84A8C4" font-size="12" font-weight="bold">FK</text>
+    <text x="44" y="100" fill="#EAE6DD" font-size="12">problem_id</text>
+    <text x="230" y="100" fill="#84A8C4" font-size="11">INT -&gt; problems.id</text>
+
+    <text x="44" y="122" fill="#EAE6DD" font-size="12">source_code</text>
+    <text x="230" y="122" fill="#9B968B" font-size="11">TEXT</text>
+
+    <text x="44" y="144" fill="#EAE6DD" font-size="12">language</text>
+    <text x="230" y="144" fill="#9B968B" font-size="11">VARCHAR(50)</text>
+
+    <text x="44" y="166" fill="#EAE6DD" font-size="12">status</text>
+    <text x="230" y="166" fill="#9B968B" font-size="11">ENUM (Accepted/WA/TLE...)</text>
+
+    <text x="44" y="188" fill="#EAE6DD" font-size="12">runtime / memory</text>
+    <text x="230" y="188" fill="#9B968B" font-size="11">FLOAT</text>
+
+    <text x="44" y="210" fill="#EAE6DD" font-size="12">error_message</text>
+    <text x="230" y="210" fill="#9B968B" font-size="11">TEXT</text>
+
+    <text x="44" y="230" fill="#EAE6DD" font-size="12">created_at</text>
+    <text x="230" y="230" fill="#9B968B" font-size="11">DATETIME</text>
+  </g>
+
+  <!-- ==================== TABLE 4: TICKETS (Standalone) ==================== -->
+  <g transform="translate(40, 305)">
+    <rect width="310" height="190" rx="6" fill="#1B1B19" stroke="#84A8C4" stroke-width="1.5"/>
+    <rect width="310" height="34" rx="6" fill="#1D252C"/>
+    <text x="14" y="22" fill="#84A8C4" font-size="13" font-weight="bold">tickets (IT Support SLA)</text>
+
+    <text x="14" y="56" fill="#D4A362" font-size="12" font-weight="bold">PK</text>
+    <text x="44" y="56" fill="#EAE6DD" font-size="12">id</text>
+    <text x="185" y="56" fill="#9B968B" font-size="11">INT</text>
+
+    <text x="44" y="78" fill="#EAE6DD" font-size="12">user_discord_id</text>
+    <text x="185" y="78" fill="#9B968B" font-size="11">VARCHAR(50)</text>
+
+    <text x="44" y="100" fill="#EAE6DD" font-size="12">issue_description</text>
+    <text x="185" y="100" fill="#9B968B" font-size="11">TEXT</text>
+
+    <text x="44" y="122" fill="#EAE6DD" font-size="12">priority</text>
+    <text x="185" y="122" fill="#9B968B" font-size="11">15m / 3h</text>
+
+    <text x="44" y="144" fill="#EAE6DD" font-size="12">status</text>
+    <text x="185" y="144" fill="#9B968B" font-size="11">Open/Solved/Expired</text>
+
+    <text x="44" y="166" fill="#EAE6DD" font-size="12">created_at / deadline</text>
+    <text x="185" y="166" fill="#9B968B" font-size="11">DATETIME</text>
+
+    <text x="44" y="184" fill="#EAE6DD" font-size="12">closed_at</text>
+    <text x="185" y="184" fill="#9B968B" font-size="11">DATETIME</text>
+  </g>
+</svg>

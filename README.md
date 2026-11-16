@@ -4,71 +4,40 @@ A web and Discord application that lets users view coding problems, submit Pytho
 
 ---
 
-## System Flow
+## Database ERD (Entity-Relationship Diagram)
 
-```mermaid
-flowchart LR
-    D[Discord Bot<br/>5 Commands] <-->|HTTP JSON| API[FastAPI Server<br/>15 REST Endpoints]
-    W[Admin Web Page] <-->|HTTP JSON| API
-    API <--> DB[(MySQL Database<br/>4 Tables)]
-    API --> DK[Docker Container<br/>256MB RAM Limit]
-    API --> AI[Gemini AI<br/>5-Line Error Snippet]
-    API --> EMAIL[Gmail SMTP<br/>Email Alert]
+![Database ERD](./FE/asset/images/erd.svg)
+
+```text
++-----------------------+          1          N  +----------------------------+
+|       problems        |-----------------------<|         test_cases         |
++-----------------------+                        +----------------------------+
+| PK  id          (INT) |                        | PK  id               (INT) |
+|     title   (VARCHAR) |                        | FK  problem_id       (INT) |
+|     description(TEXT) |                        |     input_data      (TEXT) |
+|     time_limit(FLOAT) |                        |     expected_output (TEXT) |
+|     memory_limit(INT) |                        +----------------------------+
+|     difficulty        |
++-----------------------+          1          N  +----------------------------+
+            |-----------------------------------<|        submissions         |
+                                                 +----------------------------+
++-----------------------+                        | PK  id               (INT) |
+|        tickets        |                        |     user_discord_id        |
++-----------------------+                        | FK  problem_id       (INT) |
+| PK  id          (INT) |                        |     source_code     (TEXT) |
+|     user_discord_id   |                        |     language     (VARCHAR) |
+|     issue_description |                        |     status          (ENUM) |
+|     priority(VARCHAR) |                        |     runtime        (FLOAT) |
+|     status  (VARCHAR) |                        |     memory         (FLOAT) |
+|     created_at        |                        |     error_message   (TEXT) |
+|     deadline          |                        |     created_at  (DATETIME) |
+|     closed_at         |                        +----------------------------+
++-----------------------+
 ```
 
----
-
-## Database Schema (ER Diagram)
-
-- **`problems` (1) $\rightarrow$ (N) `test_cases`**: One coding problem has multiple test cases (`problem_id` Foreign Key).
-- **`problems` (1) $\rightarrow$ (N) `submissions`**: One coding problem receives multiple user code submissions (`problem_id` Foreign Key).
-- **`tickets`**: Standalone table storing IT support issues reported by Discord users with countdown deadlines.
-
-```mermaid
-erDiagram
-    PROBLEMS ||--o{ TEST_CASES : "has"
-    PROBLEMS ||--o{ SUBMISSIONS : "receives"
-
-    PROBLEMS {
-        int id PK
-        varchar title
-        text description
-        float time_limit "Default: 1.0s"
-        int memory_limit "Default: 256MB"
-        varchar difficulty "Easy / Medium / Hard"
-    }
-
-    TEST_CASES {
-        int id PK
-        int problem_id FK
-        text input_data
-        text expected_output
-    }
-
-    SUBMISSIONS {
-        int id PK
-        varchar user_discord_id
-        int problem_id FK
-        text source_code
-        varchar language
-        varchar status "Pending / Judging / Accepted / Wrong Answer / TLE / Runtime Error"
-        float runtime
-        float memory
-        text error_message
-        datetime created_at
-    }
-
-    TICKETS {
-        int id PK
-        varchar user_discord_id
-        text issue_description
-        varchar priority "Priority (15m) / Necessary (3h)"
-        varchar status "Open / In-Progress / Solved / Expired"
-        datetime created_at
-        datetime deadline
-        datetime closed_at
-    }
-```
+- **`problems (1) ───< (N) test_cases`**: One coding problem has many test cases (`test_cases.problem_id` references `problems.id`).
+- **`problems (1) ───< (N) submissions`**: One coding problem receives many code submissions (`submissions.problem_id` references `problems.id`).
+- **`tickets`**: Independent table storing IT support issues submitted from Discord with countdown deadlines (`15 minutes` for Priority, `3 hours` for Necessary).
 
 ---
 
