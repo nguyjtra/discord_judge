@@ -49,9 +49,9 @@ def startup_db():
                     conn.execute(text("ALTER TABLE tickets ADD COLUMN deadline DATETIME NULL"))
                 conn.execute(text("ALTER TABLE tickets MODIFY COLUMN status VARCHAR(50) DEFAULT 'Open'"))
                 conn.execute(text("UPDATE tickets SET deadline = DATE_ADD(created_at, INTERVAL 3 HOUR) WHERE deadline IS NULL"))
-        print("🎉 MYSQL THÀNH CÔNG!")
+        print("MYSQL CONNECTED")
     except Exception as e:
-        print("❌ Lỗi rồi:", e)
+        print("DB ERROR:", e)
 
 @app.get("/admin", response_class=HTMLResponse)
 def admin_dashboard():
