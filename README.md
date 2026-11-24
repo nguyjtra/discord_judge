@@ -1,4 +1,4 @@
-# Discode and Ticket
+# Sandbox & Support Ticketing System 
 
 I made a project so anyone can practice and test Python right inside Discord, even from their phone. When you drop your code in the chat, my FastAPI server spins up an isolated Docker container to run it safely and replies with the output. Stuck on a bug or failed test? You can just ask the built in AI to explain the error. I also added an IT ticket system with a live timer and Gmail alerts so I can stay on top of bugs from an admin web page.
 
